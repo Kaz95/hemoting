@@ -1,5 +1,9 @@
 import datetime
+import random
+
 d = datetime.date(2022, 2, 25)
+
+bleed_locations = ['Elbow', 'Knee', 'Ankle']
 
 
 class Date(datetime.date):
@@ -11,8 +15,6 @@ class Date(datetime.date):
         super().__init__()
         self.bleeds = []
         self.infusion = infusion
-
-
 
 
 def get_start_date():
@@ -44,12 +46,49 @@ def get_max_days(start_wkday):
     return max_days
 
 
+class Bepisode:
+    def __init__(self, start, location, duration):
+        self.start = start
+        self.location = location
+        self.duration = duration
+        self.dates = []
+
+    def project_dates(self):
+        for _ in range(self.duration):
+            print(_)
+            d = self.start + datetime.timedelta(_)
+            self.dates.append(d)
+
+
 def make_blank_log(start, max_days):
     days = [start]
-    for i in range(max_days):
+    for _ in range(max_days):
         start = start + datetime.timedelta(1)
         days.append(start)
     return days
+
+
+def randomize_bleed_episode_start(start, max_days):
+    days_added = random.randrange(1, max_days)
+    bleed_start = start + datetime.timedelta(days_added)
+    return bleed_start
+
+
+def randomize_bleed_location():
+    bleed_location_index = random.randrange(len(bleed_locations))
+    bleed_location = bleed_locations[bleed_location_index]
+    return bleed_location
+
+
+def randomize_bleed_duration():
+    return random.randrange(1, 5)
+
+
+def randomize_bleed_episode(start, max_days):
+    bleed_start = randomize_bleed_episode_start(start, max_days)
+    location = randomize_bleed_location()
+    duration = randomize_bleed_duration()
+    return Bepisode(bleed_start, location, duration)
 
 
 if __name__ == '__main__':
@@ -62,3 +101,11 @@ if __name__ == '__main__':
     for i in log:
         d = i.strftime('%m/%d/%Y')
         print(d)
+
+    bepisode = randomize_bleed_episode(start_date, max_days)
+    print(bepisode.start)
+    print(bepisode.location)
+    print(bepisode.duration)
+    bepisode.project_dates()
+    for _ in bepisode.dates:
+        print(_)
