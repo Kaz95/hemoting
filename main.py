@@ -1,7 +1,8 @@
 import datetime
 import random
 
-d = datetime.date(2022, 2, 25)
+
+# d = datetime.date(2022, 2, 25)
 
 bleed_locations = ['Elbow', 'Knee', 'Ankle']
 
@@ -21,8 +22,7 @@ def get_start_date():
     y = int(input('Input Year XXXX: '))
     m = int(input('Input Month X(X): '))
     d = int(input('Input Day X(X): '))
-    d_str = f'{m}/{d}/{y}'
-    start = datetime.datetime.strptime(d_str, '%m/%d/%Y')
+    start = Date(y, m, d)
     return start
 
 
@@ -55,7 +55,7 @@ class Bepisode:
 
     def project_dates(self):
         for _ in range(self.duration):
-            print(_)
+            # print(_)
             d = self.start + datetime.timedelta(_)
             self.dates.append(d)
 
@@ -91,6 +91,28 @@ def randomize_bleed_episode(start, max_days):
     return Bepisode(bleed_start, location, duration)
 
 
+def couple_bleeds_to_dates(bepisodes_list):
+    for bepisode in bepisodes_list:
+        for day in bepisode.dates:
+            date_to_tag_index = log.index(day)
+            try:
+                date_to_tag = log[date_to_tag_index]
+                date_to_tag.bleeds.append(bepisode.location)
+            except ValueError:
+                print('Bleed projected passed end of window, probably.')
+
+
+def random_all_bleed_episodes(amount, start, max_days):
+    bep_list = []
+    for i in range(amount):
+        _ = randomize_bleed_episode(start, max_days)
+        bep_list.append(_)
+    for _ in bep_list:
+        print(_.duration)
+        _.project_dates()
+    return bep_list
+
+
 if __name__ == '__main__':
     start_date = get_start_date()
     fdate = start_date.strftime('%A - %m/%d/%Y')\
@@ -101,11 +123,23 @@ if __name__ == '__main__':
     for i in log:
         d = i.strftime('%m/%d/%Y')
         print(d)
+    bep_list = random_all_bleed_episodes(3, start_date, max_days)
+    # bep1 = randomize_bleed_episode(start_date, max_days)
+    # bep2 = randomize_bleed_episode(start_date, max_days)
+    # print(bep1.duration)
+    # print(bep2.duration)
+    # bep1.project_dates()
+    # bep2.project_dates()
+    # for _ in bepisode.dates:
+    #     print(_)
 
-    bepisode = randomize_bleed_episode(start_date, max_days)
-    print(bepisode.start)
-    print(bepisode.location)
-    print(bepisode.duration)
-    bepisode.project_dates()
-    for _ in bepisode.dates:
-        print(_)
+    # bep_list = [bep1, bep2]
+    couple_bleeds_to_dates(bep_list)
+    # Tag days with bleeds, expand to work with multiple 'bepisodes'
+    # for day in bepisode.dates:
+    #     date_to_tag_index = log.index(day)
+    #     date_to_tag = log[date_to_tag_index]
+    #     date_to_tag.bleeds.append(bepisode.location)
+
+    for _ in log:
+        print(f'{_} - {_.bleeds}')
