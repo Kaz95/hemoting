@@ -1,9 +1,6 @@
 import datetime
 import random
 
-
-# d = datetime.date(2022, 2, 25)
-
 bleed_locations = ['Elbow', 'Knee', 'Ankle']
 
 
@@ -124,22 +121,7 @@ if __name__ == '__main__':
         d = i.strftime('%m/%d/%Y')
         print(d)
     bep_list = random_all_bleed_episodes(3, start_date, max_days)
-    # bep1 = randomize_bleed_episode(start_date, max_days)
-    # bep2 = randomize_bleed_episode(start_date, max_days)
-    # print(bep1.duration)
-    # print(bep2.duration)
-    # bep1.project_dates()
-    # bep2.project_dates()
-    # for _ in bepisode.dates:
-    #     print(_)
 
-    # bep_list = [bep1, bep2]
     couple_bleeds_to_dates(bep_list)
-    # Tag days with bleeds, expand to work with multiple 'bepisodes'
-    # for day in bepisode.dates:
-    #     date_to_tag_index = log.index(day)
-    #     date_to_tag = log[date_to_tag_index]
-    #     date_to_tag.bleeds.append(bepisode.location)
-
     for _ in log:
         print(f'{_} - {_.bleeds}')
