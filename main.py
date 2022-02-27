@@ -125,10 +125,10 @@ def random_all_bleed_episodes(amount, start, max_days):
 
 
 def add_infusions_to_log(log, cur_proph_schedule):
-    doses = 11
-    while doses > 1:
+    doses = 12
+    for _ in log:
         print(f'{doses} left')
-        for _ in log:
+        if doses > 1:
             if _.bleeds:
                 cur_min_one = log.index(_) - 1
                 cur_min_two = log.index(_) - 2
@@ -160,6 +160,8 @@ def add_infusions_to_log(log, cur_proph_schedule):
                 if _.weekday() == 6:
                     cur_proph_schedule = normal_prophey_schedule
                     print('Schedule: Main')
+        else:
+            log.remove(_)
 
 
 if __name__ == '__main__':
