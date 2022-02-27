@@ -1,5 +1,6 @@
 import datetime
 import random
+import csv
 
 bleed_locations = ['Elbow', 'Knee', 'Ankle']
 normal_prophey_schedule = [0, 2, 4]
@@ -10,8 +11,10 @@ cur_prophey_schedule = normal_prophey_schedule
 def toggle_schedule(schedule):
     if schedule == normal_prophey_schedule:
         schedule = alt_prophey_schedule
+        print('Schedule: Alt')
     else:
         schedule = normal_prophey_schedule
+        print('Schedule: Main')
     return schedule
 
 
@@ -102,8 +105,8 @@ def randomize_bleed_episode(start, max_days):
 def couple_bleeds_to_dates(bepisodes_list):
     for bepisode in bepisodes_list:
         for day in bepisode.dates:
-            date_to_tag_index = log.index(day)
             try:
+                date_to_tag_index = log.index(day)
                 date_to_tag = log[date_to_tag_index]
                 date_to_tag.bleeds.append(bepisode.location)
             except ValueError:
@@ -122,33 +125,41 @@ def random_all_bleed_episodes(amount, start, max_days):
 
 
 def add_infusions_to_log(log, cur_proph_schedule):
-    for _ in log:
-        if _.bleeds:
-            cur_min_one = log.index(_) - 1
-            cur_min_two = log.index(_) - 2
-            # print(f'{_} - {_.bleeds}')
-            if cur_min_one and cur_min_two >= 0:
-                try:
-                    if log[cur_min_one].infused and log[cur_min_two].infused:
-                        continue
-                except ValueError:
-                    print('index was out of range when checking prev two days, but was handled')
-                if _.weekday() not in cur_proph_schedule:
-                    _.infused = True
-                    toggle_schedule(cur_proph_schedule)
-                else:
-                    _.infused = True
-            # else:
-            #     if _.weekday() not in cur_proph_schedule:
-            #         _.infused = True
-            #         toggle_schedule(cur_proph_schedule)
-            #     else:
-            #         _.infused = True
-        elif _.weekday() in cur_proph_schedule:
-            _.infused = True
-        else:
-            if _.weekday() == 6:
-                cur_proph_schedule = normal_prophey_schedule
+    doses = 11
+    while doses > 1:
+        print(f'{doses} left')
+        for _ in log:
+            if _.bleeds:
+                cur_min_one = log.index(_) - 1
+                cur_min_two = log.index(_) - 2
+                # print(f'{_} - {_.bleeds}')
+                if cur_min_one and cur_min_two >= 0:
+                    try:
+                        if log[cur_min_one].infused and log[cur_min_two].infused:
+                            continue
+                    except ValueError:
+                        print('index was out of range when checking prev two days, but was handled')
+                    if _.weekday() not in cur_proph_schedule:
+                        _.infused = True
+                        doses -= 1
+                        cur_proph_schedule = toggle_schedule(cur_proph_schedule)
+
+                    else:
+                        doses -= 1
+                        _.infused = True
+                # else:
+                #     if _.weekday() not in cur_proph_schedule:
+                #         _.infused = True
+                #         toggle_schedule(cur_proph_schedule)
+                #     else:
+                #         _.infused = True
+            elif _.weekday() in cur_proph_schedule:
+                _.infused = True
+                doses -= 1
+            else:
+                if _.weekday() == 6:
+                    cur_proph_schedule = normal_prophey_schedule
+                    print('Schedule: Main')
 
 
 if __name__ == '__main__':
@@ -158,14 +169,10 @@ if __name__ == '__main__':
     print(fdate)
     max_days = get_max_days(start_date.weekday())
     log = make_blank_log(start_date, max_days)
-    # for i in log:
-    #     d = i.strftime('%m/%d/%Y')
-    #     print(d)
+    #
     bep_list = random_all_bleed_episodes(3, start_date, max_days)
 
     couple_bleeds_to_dates(bep_list)
-    # for _ in log:
-    #     print(f'{_} - {_.bleeds}')
 
     add_infusions_to_log(log, cur_prophey_schedule)
     end_log = []
@@ -177,3 +184,21 @@ if __name__ == '__main__':
             print(f'{_} - {_.infused} - {_.bleeds}')
         else:
             print(f'{_} - {_.infused} - Prophey')
+    # with open('log.csv', 'x', newline='') as log:
+    #     log_writer = csv.writer(log)
+    #     log_writer.writerow(['Date', 'Infused', 'Reason'])
+    #     log_writer.writerow(['2022-02-02', 'Yes', 'Prophey'])
+    #     log_writer.writerow(['2022-02-04', 'Yes', 'Knee'])
+    end_log_start = end_log[0]
+    end_log_end = end_log[-1]
+    with open(f'{end_log_start} - {end_log_end}.csv', 'x', newline='') as csv_log:
+        log_writer = csv.writer(csv_log)
+        log_writer.writerow(['Date', 'Infused', 'Reason'])
+        for _ in end_log:
+            if _.bleeds:
+                if _.infused:
+                    log_writer.writerow([_, 'Yes', _.bleeds])
+                else:
+                    log_writer.writerow([_, 'No', _.bleeds])
+            else:
+                log_writer.writerow([_, 'Yes', 'Prophylaxis'])
