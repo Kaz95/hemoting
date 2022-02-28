@@ -2,7 +2,7 @@ import datetime
 import random
 import csv
 
-bleed_locations = ['Elbow', 'Knee', 'Ankle']
+bleed_locations = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps']
 normal_prophey_schedule = [0, 2, 4]
 alt_prophey_schedule = [1, 3, 5]
 cur_prophey_schedule = normal_prophey_schedule
