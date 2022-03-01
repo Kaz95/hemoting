@@ -27,6 +27,7 @@ class Date(datetime.datetime):
         super().__init__()
         self.bleeds = []
         self.infused = infused
+        self.time_stamp = None
 
 
 def get_start_date():
@@ -124,6 +125,12 @@ def random_all_bleed_episodes(amount, start, max_days):
     return bep_list
 
 
+def randomize_time_stamp(start_hr, end_hr):
+    rand_hr = random.randrange(start_hr, (end_hr + 1))
+    rand_minute = random.randrange(1, 60)
+    return datetime.time(hour=rand_hr, minute=rand_minute)
+
+
 def add_infusions_to_log(log, cur_proph_schedule):
     doses = 12
     for _ in log:
@@ -141,12 +148,14 @@ def add_infusions_to_log(log, cur_proph_schedule):
                         print('index was out of range when checking prev two days, but was handled')
                     if _.weekday() not in cur_proph_schedule:
                         _.infused = True
+                        _.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
                         cur_proph_schedule = toggle_schedule(cur_proph_schedule)
 
                     else:
                         doses -= 1
                         _.infused = True
+                        _.time_stamp = randomize_time_stamp(7, 10)
                 # else:
                 #     if _.weekday() not in cur_proph_schedule:
                 #         _.infused = True
@@ -156,6 +165,7 @@ def add_infusions_to_log(log, cur_proph_schedule):
             elif _.weekday() in cur_proph_schedule:
                 _.infused = True
                 doses -= 1
+                _.time_stamp = randomize_time_stamp(7, 10)
             else:
                 if _.weekday() == 6:
                     cur_proph_schedule = normal_prophey_schedule
@@ -197,12 +207,12 @@ if __name__ == '__main__':
     end_log_end = end_log_end.strftime('%m-%d-%Y')
     with open(f'{end_log_start} - {end_log_end}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
-        log_writer.writerow(['Date', 'Infused', 'Reason'])
+        log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
         for _ in end_log:
             if _.bleeds:
                 if _.infused:
-                    log_writer.writerow([_, 'Yes', _.bleeds])
+                    log_writer.writerow([_, 'Yes', _.time_stamp, _.bleeds])
                 else:
-                    log_writer.writerow([_, 'No', _.bleeds])
+                    log_writer.writerow([_, 'No', 'N/A', _.bleeds])
             else:
-                log_writer.writerow([_, 'Yes', 'Prophylaxis'])
+                log_writer.writerow([_, 'Yes', _.time_stamp, 'Prophylaxis'])
