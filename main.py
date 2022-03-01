@@ -18,12 +18,12 @@ def toggle_schedule(schedule):
     return schedule
 
 
-class Date(datetime.date):
+class Date(datetime.datetime):
 
-    def __new__(cls, year, month, day, infusion=None):
-        return super().__new__(cls, year=year, month=month, day=day)
+    def __new__(cls, year, month, day, hour, minute, second, microsecond, tzinfo, infusion=None):
+        return super().__new__(cls, year=year, month=month, day=day, hour=hour, minute=minute, second=second, microsecond=microsecond, tzinfo=tzinfo)
 
-    def __init__(self, year, month, day, infused=False):
+    def __init__(self, year, month, day, hour, minute, second, microsecond, tzinfo, infused=False):
         super().__init__()
         self.bleeds = []
         self.infused = infused
@@ -33,7 +33,7 @@ def get_start_date():
     y = int(input('Input Year XXXX: '))
     m = int(input('Input Month X(X): '))
     d = int(input('Input Day X(X): '))
-    start = Date(y, m, d)
+    start = Date(y, m, d, 0, 0, 0, 0, None)
     return start
 
 
@@ -192,7 +192,9 @@ if __name__ == '__main__':
     #     log_writer.writerow(['2022-02-02', 'Yes', 'Prophey'])
     #     log_writer.writerow(['2022-02-04', 'Yes', 'Knee'])
     end_log_start = end_log[0]
+    end_log_start = end_log_start.strftime('%m-%d-%Y')
     end_log_end = end_log[-1]
+    end_log_end = end_log_end.strftime('%m-%d-%Y')
     with open(f'{end_log_start} - {end_log_end}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
         log_writer.writerow(['Date', 'Infused', 'Reason'])
