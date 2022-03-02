@@ -11,10 +11,8 @@ cur_prophey_schedule = normal_prophey_schedule
 def toggle_schedule(schedule):
     if schedule == normal_prophey_schedule:
         schedule = alt_prophey_schedule
-        print('Schedule: Alt')
     else:
         schedule = normal_prophey_schedule
-        print('Schedule: Main')
     return schedule
 
 
@@ -42,20 +40,19 @@ def get_start_date():
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # Figured out by hand, consider how I could have done this using math.
 def get_max_days(start_wkday):
-    max_days = 21
+    maximum_days = 21
     # Mon or Wed
     if start_wkday in [0, 2]:
-        max_days += 2
+        maximum_days += 2
     # Sun, Tue, or Fri
     elif start_wkday in [6, 1, 4]:
-        max_days += 3
+        maximum_days += 3
     # Sat or Thr
     elif start_wkday in [3, 5]:
-        max_days += 4
+        maximum_days += 4
     else:
         raise Exception('Weekday was somehow out of range?')
-
-    return max_days
+    return maximum_days
 
 
 class Bepisode:
@@ -72,16 +69,16 @@ class Bepisode:
             self.dates.append(d)
 
 
-def make_blank_log(start, max_days):
+def make_blank_log(start, maximum_days):
     days = [start]
-    for _ in range(max_days):
+    for _ in range(maximum_days):
         start = start + datetime.timedelta(1)
         days.append(start)
     return days
 
 
-def randomize_bleed_episode_start(start, max_days):
-    days_added = random.randrange(1, max_days)
+def randomize_bleed_episode_start(start, maximum_days):
+    days_added = random.randrange(1, maximum_days)
     bleed_start = start + datetime.timedelta(days_added)
     return bleed_start
 
@@ -96,14 +93,14 @@ def randomize_bleed_duration():
     return random.randrange(1, 5)
 
 
-def randomize_bleed_episode(start, max_days):
-    bleed_start = randomize_bleed_episode_start(start, max_days)
+def randomize_bleed_episode(start, maximum_days):
+    bleed_start = randomize_bleed_episode_start(start, maximum_days)
     location = randomize_bleed_location()
     duration = randomize_bleed_duration()
     return Bepisode(bleed_start, location, duration)
 
 
-def couple_bleeds_to_dates(bepisodes_list):
+def couple_bleeds_to_dates(bepisodes_list, log):
     for bepisode in bepisodes_list:
         for day in bepisode.dates:
             try:
@@ -112,17 +109,18 @@ def couple_bleeds_to_dates(bepisodes_list):
                 date_to_tag.bleeds.append(bepisode.location)
             except ValueError:
                 print('Bleed projected passed end of window, probably.')
+    return log
 
 
-def random_all_bleed_episodes(amount, start, max_days):
-    bep_list = []
+def random_all_bleed_episodes(amount, start, maximum_days):
+    bepi_list = []
     for i in range(amount):
-        _ = randomize_bleed_episode(start, max_days)
+        _ = randomize_bleed_episode(start, maximum_days)
         bep_list.append(_)
     for _ in bep_list:
         print(f'{_.duration} - {_.location}')
         _.project_dates()
-    return bep_list
+    return bepi_list
 
 
 def randomize_time_stamp(start_hr, end_hr):
@@ -139,7 +137,6 @@ def add_infusions_to_log(log, cur_proph_schedule):
             if _.bleeds:
                 cur_min_one = log.index(_) - 1
                 cur_min_two = log.index(_) - 2
-                # print(f'{_} - {_.bleeds}')
                 if cur_min_one and cur_min_two >= 0:
                     try:
                         if log[cur_min_one].infused and log[cur_min_two].infused:
@@ -156,12 +153,7 @@ def add_infusions_to_log(log, cur_proph_schedule):
                         doses -= 1
                         _.infused = True
                         _.time_stamp = randomize_time_stamp(7, 10)
-                # else:
-                #     if _.weekday() not in cur_proph_schedule:
-                #         _.infused = True
-                #         toggle_schedule(cur_proph_schedule)
-                #     else:
-                #         _.infused = True
+
             elif _.weekday() in cur_proph_schedule:
                 _.infused = True
                 doses -= 1
@@ -169,9 +161,9 @@ def add_infusions_to_log(log, cur_proph_schedule):
             else:
                 if _.weekday() == 6:
                     cur_proph_schedule = normal_prophey_schedule
-                    print('Schedule: Main')
         else:
             log.remove(_)
+    return log
 
 
 if __name__ == '__main__':
@@ -180,15 +172,15 @@ if __name__ == '__main__':
 
     print(fdate)
     max_days = get_max_days(start_date.weekday())
-    log = make_blank_log(start_date, max_days)
+    blank_log = make_blank_log(start_date, max_days)
     #
     bep_list = random_all_bleed_episodes(3, start_date, max_days)
 
-    couple_bleeds_to_dates(bep_list)
+    log_with_bleeds = couple_bleeds_to_dates(bep_list, blank_log)
 
-    add_infusions_to_log(log, cur_prophey_schedule)
+    full_log = add_infusions_to_log(log_with_bleeds, cur_prophey_schedule)
     end_log = []
-    for _ in log:
+    for _ in full_log:
         if _.bleeds or _.infused:
             end_log.append(_)
     for _ in end_log:
