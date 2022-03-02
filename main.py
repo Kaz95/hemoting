@@ -112,9 +112,8 @@ def couple_bleeds_to_dates(bepisodes_list, log):
     return log
 
 
-def random_all_bleed_episodes(amount, start, maximum_days):
-    bepi_list = []
-    for i in range(amount):
+def random_all_bleed_episodes(amount, start, maximum_days, bepi_list):
+    while len(bepi_list) < amount:
         _ = randomize_bleed_episode(start, maximum_days)
         bepi_list.append(_)
     for _ in bepi_list:
@@ -133,7 +132,6 @@ def add_infusions_to_log(log, cur_proph_schedule):
     doses = 12
     new_list = []
     for _ in log:
-        print(f'{doses} left')
         if doses > 1:
             new_list.append(_)
             if _.bleeds:
@@ -145,6 +143,17 @@ def add_infusions_to_log(log, cur_proph_schedule):
                             continue
                     except ValueError:
                         print('index was out of range when checking prev two days, but was handled')
+                    if _.weekday() not in cur_proph_schedule:
+                        _.infused = True
+                        _.time_stamp = randomize_time_stamp(7, 10)
+                        doses -= 1
+                        cur_proph_schedule = toggle_schedule(cur_proph_schedule)
+
+                    else:
+                        doses -= 1
+                        _.infused = True
+                        _.time_stamp = randomize_time_stamp(7, 10)
+                else:
                     if _.weekday() not in cur_proph_schedule:
                         _.infused = True
                         _.time_stamp = randomize_time_stamp(7, 10)
@@ -169,6 +178,21 @@ def add_infusions_to_log(log, cur_proph_schedule):
     return new_list
 
 
+def get_manual_bleeds():
+    bepi_list = []
+    while True:
+        answer = input('Add Manual Bepisode? ')
+        if answer.capitalize() == 'Y':
+            start = get_start_date()
+            location = input('Enter Bleed location ')
+            duration = int(input('Enter Numerical Duration '))
+            bepi = Bepisode(start, location, duration)
+            bepi_list.append(bepi)
+        else:
+            break
+    return bepi_list
+
+
 if __name__ == '__main__':
     start_date = get_start_date()
     fdate = start_date.strftime('%A - %m/%d/%Y')\
@@ -176,13 +200,12 @@ if __name__ == '__main__':
     print(fdate)
     max_days = get_max_days(start_date.weekday())
     blank_log = make_blank_log(start_date, max_days)
-    #
-    bep_list = random_all_bleed_episodes(3, start_date, max_days)
+    bep_list = get_manual_bleeds()
+    bep_list = random_all_bleed_episodes(3, start_date, max_days, bep_list)
 
     log_with_bleeds = couple_bleeds_to_dates(bep_list, blank_log)
 
     full_log = add_infusions_to_log(log_with_bleeds, cur_prophey_schedule)
-    print(full_log)
     end_log = []
     for _ in full_log:
         if _.bleeds or _.infused:
