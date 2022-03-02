@@ -116,8 +116,8 @@ def random_all_bleed_episodes(amount, start, maximum_days):
     bepi_list = []
     for i in range(amount):
         _ = randomize_bleed_episode(start, maximum_days)
-        bep_list.append(_)
-    for _ in bep_list:
+        bepi_list.append(_)
+    for _ in bepi_list:
         print(f'{_.duration} - {_.location}')
         _.project_dates()
     return bepi_list
@@ -131,9 +131,11 @@ def randomize_time_stamp(start_hr, end_hr):
 
 def add_infusions_to_log(log, cur_proph_schedule):
     doses = 12
+    new_list = []
     for _ in log:
         print(f'{doses} left')
         if doses > 1:
+            new_list.append(_)
             if _.bleeds:
                 cur_min_one = log.index(_) - 1
                 cur_min_two = log.index(_) - 2
@@ -162,8 +164,9 @@ def add_infusions_to_log(log, cur_proph_schedule):
                 if _.weekday() == 6:
                     cur_proph_schedule = normal_prophey_schedule
         else:
-            log.remove(_)
-    return log
+            pass
+
+    return new_list
 
 
 if __name__ == '__main__':
@@ -179,6 +182,7 @@ if __name__ == '__main__':
     log_with_bleeds = couple_bleeds_to_dates(bep_list, blank_log)
 
     full_log = add_infusions_to_log(log_with_bleeds, cur_prophey_schedule)
+    print(full_log)
     end_log = []
     for _ in full_log:
         if _.bleeds or _.infused:
@@ -188,11 +192,7 @@ if __name__ == '__main__':
             print(f'{_} - {_.infused} - {_.bleeds}')
         else:
             print(f'{_} - {_.infused} - Prophey')
-    # with open('log.csv', 'x', newline='') as log:
-    #     log_writer = csv.writer(log)
-    #     log_writer.writerow(['Date', 'Infused', 'Reason'])
-    #     log_writer.writerow(['2022-02-02', 'Yes', 'Prophey'])
-    #     log_writer.writerow(['2022-02-04', 'Yes', 'Knee'])
+
     end_log_start = end_log[0]
     end_log_start = end_log_start.strftime('%m-%d-%Y')
     end_log_end = end_log[-1]
