@@ -2,7 +2,7 @@ import datetime
 import random
 import csv
 
-bleed_locations = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps']
+bleed_locations_list = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps']
 normal_prophey_schedule = [0, 2, 4]
 alt_prophey_schedule = [1, 3, 5]
 cur_prophey_schedule = normal_prophey_schedule
@@ -25,18 +25,18 @@ class Date(datetime.datetime):
 
     def __init__(self, year, month, day, hour, minute, second, microsecond, tzinfo, infused=False):
         super().__init__()
-        self.bleeds = []
+        self.bleeds_list = []
         self.infused = infused
         self.time_stamp = None
 
 
 # TODO: Refactor
-def get_start_date():
-    y = int(input('Input Year XXXX: '))
-    m = int(input('Input Month X(X): '))
-    d = int(input('Input Day X(X): '))
-    start = Date(y, m, d, 0, 0, 0, 0, None)
-    return start
+def get_date():
+    year = int(input('Input Year XXXX: '))
+    month = int(input('Input Month X(X): '))
+    day = int(input('Input Day X(X): '))
+    date = Date(year, month, day, 0, 0, 0, 0, None)
+    return date
 
 
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
@@ -58,186 +58,182 @@ def get_max_days(start_wkday):
     return maximum_days
 
 
-# TODO: Refactor
 class Bepisode:
-    def __init__(self, start, location, duration):
-        self.start = start
+    def __init__(self, start_date, location, duration):
+        self.start_date = start_date
         self.location = location
         self.duration = duration
-        self.dates = []
+        self.dates_list = []
 
-    # TODO: Refactor
     def project_dates(self):
         for _ in range(self.duration):
-            d = self.start + datetime.timedelta(_)
-            self.dates.append(d)
+            projected_date = self.start_date + datetime.timedelta(_)
+            self.dates_list.append(projected_date)
 
 
-# TODO: Refactor
-def make_blank_log(start, maximum_days):
-    days = [start]
+# TODO: This might be fukt post refactor
+def make_blank_log(start_date, maximum_days):
+    blank_log = [start_date]
+    temp_date = start_date
     for _ in range(maximum_days):
-        start = start + datetime.timedelta(1)
-        days.append(start)
-    return days
+        temp_date = temp_date + datetime.timedelta(1)
+        blank_log.append(temp_date)
+        # start_date = start_date + datetime.timedelta(1)
+        # blank_log.append(start_date)
+    return blank_log
 
 
-# TODO: Refactor
-def randomize_bleed_episode_start(start, maximum_days):
+def randomize_bleed_episode_start(start_date, maximum_days):
     days_added = random.randrange(1, maximum_days)
-    bleed_start = start + datetime.timedelta(days_added)
-    return bleed_start
+    bleed_start_start = start_date + datetime.timedelta(days_added)
+    return bleed_start_start
 
 
-# TODO: Refactor
 def randomize_bleed_location():
-    bleed_location_index = random.randrange(len(bleed_locations))
-    bleed_location = bleed_locations[bleed_location_index]
-    return bleed_location
+    bleed_location_index = random.randrange(len(bleed_locations_list))
+    bleed_location_string = bleed_locations_list[bleed_location_index]
+    return bleed_location_string
 
 
 def randomize_bleed_duration():
     return random.randrange(1, 5)
 
 
-# TODO: Refactor
-def randomize_bleed_episode(start, maximum_days):
-    bleed_start = randomize_bleed_episode_start(start, maximum_days)
+def randomize_bleed_episode(start_date, maximum_days):
+    bleed_start_date = randomize_bleed_episode_start(start_date, maximum_days)
     location = randomize_bleed_location()
     duration = randomize_bleed_duration()
-    return Bepisode(bleed_start, location, duration)
+    return Bepisode(bleed_start_date, location, duration)
 
 
-# TODO: Refactor
 def couple_bleeds_to_dates(bepisodes_list, some_log):
     for bepisode in bepisodes_list:
-        for day in bepisode.dates:
+        for day in bepisode.dates_list:
             try:
                 date_to_tag_index = some_log.index(day)
                 date_to_tag = some_log[date_to_tag_index]
-                date_to_tag.bleeds.append(bepisode.location)
+                date_to_tag.bleeds_list.append(bepisode.location)
             except ValueError:
                 print('Bleed projected passed end of window, probably.')
     return some_log
 
 
-# TODO: Refactor
-def random_all_bleed_episodes(amount, start, maximum_days, bepi_list):
-    while len(bepi_list) < amount:
-        _ = randomize_bleed_episode(start, maximum_days)
-        bepi_list.append(_)
-    for _ in bepi_list:
-        print(f'{_.duration} - {_.location}')
-        _.project_dates()
-    return bepi_list
+def random_all_bleed_episodes(amount_of_bleeds, start_date, maximum_days, bepisode_list):
+    while len(bepisode_list) < amount_of_bleeds:
+        bepisode = randomize_bleed_episode(start_date, maximum_days)
+        bepisode_list.append(bepisode)
+    for bepisode in bepisode_list:
+        print(f'{bepisode.duration} - {bepisode.location}')
+        bepisode.project_dates()
+    return bepisode_list
 
 
-# TODO: Refactor
 def randomize_time_stamp(start_hr, end_hr):
     rand_hr = random.randrange(start_hr, (end_hr + 1))
     rand_minute = random.randrange(1, 60)
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
-# TODO: Refactor
 def add_infusions_to_log(some_log, cur_proph_schedule):
     doses = 12
-    new_list = []
-    for _ in some_log:
+    infusion_log = []
+    for day in some_log:
         if doses > 1:
-            new_list.append(_)
-            if _.bleeds:
-                cur_min_one = some_log.index(_) - 1
-                cur_min_two = some_log.index(_) - 2
-                if cur_min_one and cur_min_two >= 0:
+            # TODO: I think if I'm more selective on when to append, I can avoid sifting later.
+            infusion_log.append(day)
+            if day.bleeds_list:
+                yesterday_index = some_log.index(day) - 1
+                day_before_yesterday_index = some_log.index(day) - 2
+                if yesterday_index and day_before_yesterday_index >= 0:
                     try:
-                        if some_log[cur_min_one].infused and some_log[cur_min_two].infused:
+                        if some_log[yesterday_index].infused and some_log[day_before_yesterday_index].infused:
                             continue
                     except ValueError:
                         print('index was out of range when checking prev two days, but was handled')
-                    if _.weekday() not in cur_proph_schedule:
-                        _.infused = True
-                        _.time_stamp = randomize_time_stamp(7, 10)
+                    # TODO: This needs to be refactored into a function
+                    if day.weekday() not in cur_proph_schedule:
+                        day.infused = True
+                        day.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
                         cur_proph_schedule = toggle_schedule(cur_proph_schedule)
-
+                    # TODO: This needs to be refactored into a function
                     else:
                         doses -= 1
-                        _.infused = True
-                        _.time_stamp = randomize_time_stamp(7, 10)
+                        day.infused = True
+                        day.time_stamp = randomize_time_stamp(7, 10)
+                # TODO: This needs to be refactored into a function
                 else:
-                    if _.weekday() not in cur_proph_schedule:
-                        _.infused = True
-                        _.time_stamp = randomize_time_stamp(7, 10)
+                    if day.weekday() not in cur_proph_schedule:
+                        day.infused = True
+                        day.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
                         cur_proph_schedule = toggle_schedule(cur_proph_schedule)
 
                     else:
                         doses -= 1
-                        _.infused = True
-                        _.time_stamp = randomize_time_stamp(7, 10)
-
-            elif _.weekday() in cur_proph_schedule:
-                _.infused = True
+                        day.infused = True
+                        day.time_stamp = randomize_time_stamp(7, 10)
+            # TODO: This needs to be refactored into a function
+            elif day.weekday() in cur_proph_schedule:
+                day.infused = True
                 doses -= 1
-                _.time_stamp = randomize_time_stamp(7, 10)
+                day.time_stamp = randomize_time_stamp(7, 10)
+            # TODO: Consider changing toggle function to cover this case.
             else:
-                if _.weekday() == 6:
+                if day.weekday() == 6:
                     cur_proph_schedule = normal_prophey_schedule
         else:
             pass
 
-    return new_list
+    return infusion_log
 
 
-# TODO: Refactor
 def get_manual_bleeds():
-    bepi_list = []
+    bepisode_list = []
     while True:
         answer = input('Add Manual Bepisode? ')
         if answer.capitalize() == 'Y':
-            start = get_start_date()
+            start_date = get_date()
             location = input('Enter Bleed location ')
             duration = int(input('Enter Numerical Duration '))
-            bepi = Bepisode(start, location, duration)
-            bepi_list.append(bepi)
+            bepisode = Bepisode(start_date, location, duration)
+            bepisode_list.append(bepisode)
         else:
             break
-    return bepi_list
+    return bepisode_list
 
 
 # TODO: Refactor
+# TODO: Amount of bleeds should probably be input.
 def fill_log():
-    start_date = get_start_date()
-    fdate = start_date.strftime('%A - %m/%d/%Y')\
+    start_date = get_date()
+    formatted_date = start_date.strftime('%A - %m/%d/%Y')\
 
-    print(fdate)
+    print(formatted_date)
     max_days = get_max_days(start_date.weekday())
     blank_log = make_blank_log(start_date, max_days)
-    bep_list = get_manual_bleeds()
-    bep_list = random_all_bleed_episodes(3, start_date, max_days, bep_list)
+    bepisode_list = get_manual_bleeds()
+    bepisode_list = random_all_bleed_episodes(3, start_date, max_days, bepisode_list)
 
-    log_with_bleeds = couple_bleeds_to_dates(bep_list, blank_log)
+    log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
 
     full_log = add_infusions_to_log(log_with_bleeds, cur_prophey_schedule)
     return full_log
 
 
-# TODO: Refactor
 def sift_log(some_log):
     sifted_log = []
-    for _ in some_log:
-        if _.bleeds or _.infused:
-            sifted_log.append(_)
-    for _ in sifted_log:
-        if _.bleeds:
-            print(f'{_} - {_.infused} - {_.bleeds}')
+    for day in some_log:
+        if day.bleeds_list or day.infused:
+            sifted_log.append(day)
+    for day in sifted_log:
+        if day.bleeds_list:
+            print(f'{day} - {day.infused} - {day.bleeds_list}')
         else:
-            print(f'{_} - {_.infused} - Prophey')
+            print(f'{day} - {day.infused} - Prophey')
     return sifted_log
 
 
-# TODO: Refactor
 def make_csv_title(some_log):
     start_date = some_log[0]
     start_date_string = start_date.strftime('%m-%d-%Y')
@@ -246,20 +242,19 @@ def make_csv_title(some_log):
     return start_date_string, end_date_string
 
 
-# TODO: Refactor
 def output_to_csv(some_log):
     csv_title = make_csv_title(some_log)
     with open(f'{csv_title[0]} - {csv_title[1]}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
         log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
-        for _ in end_log:
-            if _.bleeds:
-                if _.infused:
-                    log_writer.writerow([_, 'Yes', _.time_stamp, _.bleeds])
+        for day in end_log:
+            if day.bleeds_list:
+                if day.infused:
+                    log_writer.writerow([day, 'Yes', day.time_stamp, day.bleeds_list])
                 else:
-                    log_writer.writerow([_, 'No', 'N/A', _.bleeds])
+                    log_writer.writerow([day, 'No', 'N/A', day.bleeds_list])
             else:
-                log_writer.writerow([_, 'Yes', _.time_stamp, 'Prophylaxis'])
+                log_writer.writerow([day, 'Yes', day.time_stamp, 'Prophylaxis'])
 
 
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
