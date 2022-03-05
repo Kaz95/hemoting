@@ -6,6 +6,7 @@ bleed_locations = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadri
 normal_prophey_schedule = [0, 2, 4]
 alt_prophey_schedule = [1, 3, 5]
 cur_prophey_schedule = normal_prophey_schedule
+# TODO: These are now the only global constants, I probably should change current schedule. It's not constant.
 
 
 def toggle_schedule(schedule):
@@ -29,6 +30,7 @@ class Date(datetime.datetime):
         self.time_stamp = None
 
 
+# TODO: Refactor
 def get_start_date():
     y = int(input('Input Year XXXX: '))
     m = int(input('Input Month X(X): '))
@@ -56,6 +58,7 @@ def get_max_days(start_wkday):
     return maximum_days
 
 
+# TODO: Refactor
 class Bepisode:
     def __init__(self, start, location, duration):
         self.start = start
@@ -63,13 +66,14 @@ class Bepisode:
         self.duration = duration
         self.dates = []
 
+    # TODO: Refactor
     def project_dates(self):
         for _ in range(self.duration):
-            # print(_)
             d = self.start + datetime.timedelta(_)
             self.dates.append(d)
 
 
+# TODO: Refactor
 def make_blank_log(start, maximum_days):
     days = [start]
     for _ in range(maximum_days):
@@ -78,12 +82,14 @@ def make_blank_log(start, maximum_days):
     return days
 
 
+# TODO: Refactor
 def randomize_bleed_episode_start(start, maximum_days):
     days_added = random.randrange(1, maximum_days)
     bleed_start = start + datetime.timedelta(days_added)
     return bleed_start
 
 
+# TODO: Refactor
 def randomize_bleed_location():
     bleed_location_index = random.randrange(len(bleed_locations))
     bleed_location = bleed_locations[bleed_location_index]
@@ -94,6 +100,7 @@ def randomize_bleed_duration():
     return random.randrange(1, 5)
 
 
+# TODO: Refactor
 def randomize_bleed_episode(start, maximum_days):
     bleed_start = randomize_bleed_episode_start(start, maximum_days)
     location = randomize_bleed_location()
@@ -101,6 +108,7 @@ def randomize_bleed_episode(start, maximum_days):
     return Bepisode(bleed_start, location, duration)
 
 
+# TODO: Refactor
 def couple_bleeds_to_dates(bepisodes_list, some_log):
     for bepisode in bepisodes_list:
         for day in bepisode.dates:
@@ -113,6 +121,7 @@ def couple_bleeds_to_dates(bepisodes_list, some_log):
     return some_log
 
 
+# TODO: Refactor
 def random_all_bleed_episodes(amount, start, maximum_days, bepi_list):
     while len(bepi_list) < amount:
         _ = randomize_bleed_episode(start, maximum_days)
@@ -123,12 +132,14 @@ def random_all_bleed_episodes(amount, start, maximum_days, bepi_list):
     return bepi_list
 
 
+# TODO: Refactor
 def randomize_time_stamp(start_hr, end_hr):
     rand_hr = random.randrange(start_hr, (end_hr + 1))
     rand_minute = random.randrange(1, 60)
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
+# TODO: Refactor
 def add_infusions_to_log(some_log, cur_proph_schedule):
     doses = 12
     new_list = []
@@ -179,6 +190,7 @@ def add_infusions_to_log(some_log, cur_proph_schedule):
     return new_list
 
 
+# TODO: Refactor
 def get_manual_bleeds():
     bepi_list = []
     while True:
@@ -194,6 +206,7 @@ def get_manual_bleeds():
     return bepi_list
 
 
+# TODO: Refactor
 def fill_log():
     start_date = get_start_date()
     fdate = start_date.strftime('%A - %m/%d/%Y')\
@@ -210,6 +223,7 @@ def fill_log():
     return full_log
 
 
+# TODO: Refactor
 def sift_log(some_log):
     sifted_log = []
     for _ in some_log:
@@ -223,6 +237,7 @@ def sift_log(some_log):
     return sifted_log
 
 
+# TODO: Refactor
 def make_csv_title(some_log):
     start_date = some_log[0]
     start_date_string = start_date.strftime('%m-%d-%Y')
@@ -231,6 +246,7 @@ def make_csv_title(some_log):
     return start_date_string, end_date_string
 
 
+# TODO: Refactor
 def output_to_csv(some_log):
     csv_title = make_csv_title(some_log)
     with open(f'{csv_title[0]} - {csv_title[1]}.csv', 'x', newline='') as csv_log:
@@ -246,6 +262,7 @@ def output_to_csv(some_log):
                 log_writer.writerow([_, 'Yes', _.time_stamp, 'Prophylaxis'])
 
 
+# TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
 if __name__ == '__main__':
     log = fill_log()
     end_log = sift_log(log)
