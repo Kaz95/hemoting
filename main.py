@@ -5,9 +5,9 @@ import csv
 # Used to randomize bleed location. Nothing else.
 bleed_locations_list = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps']
 # List of days of the week as used by the datetime class. Mon, Wed, Fri.
-normal_prophey_schedule = [0, 2, 4]
+normal_prophey_schedule = (0, 2, 4)
 # List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
-alt_prophey_schedule = [1, 3, 5]
+alt_prophey_schedule = (1, 3, 5)
 
 
 # Toggles between Normal and alternative prophey schedules.
@@ -275,7 +275,6 @@ def make_csv_title(some_log):
 
 
 # Used to output a sifted log to csv
-# TODO: You know I'm pretttty sure I could sift here too. I pretty much am already. I suppose it wont be as bad once DB.
 def output_to_csv(some_log):
     csv_title = make_csv_title(some_log)
     with open(f'{csv_title[0]} - {csv_title[1]}.csv', 'x', newline='') as csv_log:
@@ -292,6 +291,7 @@ def output_to_csv(some_log):
 
 
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 1
 if __name__ == '__main__':
     log = fill_log()
     # end_log = sift_log(log)
