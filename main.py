@@ -8,12 +8,10 @@ bleed_locations_list = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Q
 normal_prophey_schedule = [0, 2, 4]
 # List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
 alt_prophey_schedule = [1, 3, 5]
-# TODO: These are now the only global constants, I probably should change current schedule. It's not constant.
 
 
 # Toggles between Normal and alternative prophey schedules.
 # Will always output the schedule tht is not currently selected
-# Can also be used to initiate schedule to current schedule from None.
 def toggle_schedule(schedule):
     if schedule == normal_prophey_schedule:
         schedule = alt_prophey_schedule
@@ -81,7 +79,6 @@ class Bepisode:
 
 
 # Creates and returns a list of Date objects within a range based on input.
-# TODO: This might be fukt post refactor
 def make_blank_log(start_date, maximum_days):
     blank_log = [start_date]
     temp_date = start_date
@@ -154,18 +151,14 @@ def randomize_time_stamp(start_hr, end_hr):
 # Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
 # Increments dates in list and adds them to a new list. Subtracts a dose for every infusion.
 # Finishes after 11 infusions and returns the new list.
-# TODO: I could probably find the index of the last date(11th infusion) and slice the rest of the list off with list notation bullshits.
 def add_infusions_to_log(some_log):
     current_prophey_schedule = normal_prophey_schedule
     doses = 12
     infusion_log = []
     for day in some_log:
         if doses > 1:
-            # TODO: I think if I'm more selective on when to append, I can avoid sifting later.
-            # TODO: Append if day.bleeds_list or day.weekday() in cur_proph_schedule
-            # TODO: I think that does it.
-            infusion_log.append(day)
             if day.bleeds_list:
+                infusion_log.append(day)
                 yesterday_index = some_log.index(day) - 1
                 day_before_yesterday_index = some_log.index(day) - 2
                 if yesterday_index and day_before_yesterday_index >= 0:
@@ -199,13 +192,14 @@ def add_infusions_to_log(some_log):
                         day.time_stamp = randomize_time_stamp(7, 10)
             # TODO: This needs to be refactored into a function
             elif day.weekday() in current_prophey_schedule:
+                infusion_log.append(day)
                 day.infused = True
                 doses -= 1
                 day.time_stamp = randomize_time_stamp(7, 10)
-            # TODO: Consider changing toggle function to cover this case.
             else:
                 if day.weekday() == 6:
-                    cur_proph_schedule = normal_prophey_schedule
+                    current_prophey_schedule = normal_prophey_schedule
+        # TODO is this else case even needed?
         else:
             pass
 
@@ -248,21 +242,26 @@ def fill_log():
     return full_log
 
 
-# TODO: I don't think i need this at all. Sift somewhere else.
-# TODO: I think after this step is completed I can shove info right into DB, as well as output directly to CSV.
-# TODO: I can also not output to CSV following this and only ever do so from DB. I feel like direct CSV out put is worth
 # Sifts a list of Date objects for bleeds and infusions. Returns them in a new list.
-def sift_log(some_log):
-    sifted_log = []
+# def sift_log(some_log):
+#     sifted_log = []
+#     for day in some_log:
+#         if day.bleeds_list or day.infused:
+#             sifted_log.append(day)
+#     for day in sifted_log:
+#         if day.bleeds_list:
+#             print(f'{day} - {day.infused} - {day.bleeds_list}')
+#         else:
+#             print(f'{day} - {day.infused} - Prophey')
+#     return sifted_log
+
+
+def test_print_thingo(some_log):
     for day in some_log:
-        if day.bleeds_list or day.infused:
-            sifted_log.append(day)
-    for day in sifted_log:
         if day.bleeds_list:
             print(f'{day} - {day.infused} - {day.bleeds_list}')
         else:
             print(f'{day} - {day.infused} - Prophey')
-    return sifted_log
 
 
 # Creates a string title for csv files based on first and last item in a list of Date objects.
@@ -282,7 +281,7 @@ def output_to_csv(some_log):
     with open(f'{csv_title[0]} - {csv_title[1]}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
         log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
-        for day in end_log:
+        for day in some_log:
             if day.bleeds_list:
                 if day.infused:
                     log_writer.writerow([day, 'Yes', day.time_stamp, day.bleeds_list])
@@ -295,7 +294,8 @@ def output_to_csv(some_log):
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
 if __name__ == '__main__':
     log = fill_log()
-    end_log = sift_log(log)
-    output_to_csv(end_log)
+    # end_log = sift_log(log)
+    test_print_thingo(log)
+    output_to_csv(log)
 
     
