@@ -8,13 +8,12 @@ bleed_locations_list = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Q
 normal_prophey_schedule = [0, 2, 4]
 # List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
 alt_prophey_schedule = [1, 3, 5]
-# Holds current schedule for reference by various other functions. Consider injecting this variable where needed.
-cur_prophey_schedule = normal_prophey_schedule
 # TODO: These are now the only global constants, I probably should change current schedule. It's not constant.
 
 
 # Toggles between Normal and alternative prophey schedules.
 # Will always output the schedule tht is not currently selected
+# Can also be used to initiate schedule to current schedule from None.
 def toggle_schedule(schedule):
     if schedule == normal_prophey_schedule:
         schedule = alt_prophey_schedule
@@ -156,7 +155,8 @@ def randomize_time_stamp(start_hr, end_hr):
 # Increments dates in list and adds them to a new list. Subtracts a dose for every infusion.
 # Finishes after 11 infusions and returns the new list.
 # TODO: I could probably find the index of the last date(11th infusion) and slice the rest of the list off with list notation bullshits.
-def add_infusions_to_log(some_log, cur_proph_schedule):
+def add_infusions_to_log(some_log):
+    current_prophey_schedule = normal_prophey_schedule
     doses = 12
     infusion_log = []
     for day in some_log:
@@ -175,11 +175,11 @@ def add_infusions_to_log(some_log, cur_proph_schedule):
                     except ValueError:
                         print('index was out of range when checking prev two days, but was handled')
                     # TODO: This needs to be refactored into a function
-                    if day.weekday() not in cur_proph_schedule:
+                    if day.weekday() not in current_prophey_schedule:
                         day.infused = True
                         day.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
-                        cur_proph_schedule = toggle_schedule(cur_proph_schedule)
+                        cur_proph_schedule = toggle_schedule(current_prophey_schedule)
                     # TODO: This needs to be refactored into a function
                     else:
                         doses -= 1
@@ -187,18 +187,18 @@ def add_infusions_to_log(some_log, cur_proph_schedule):
                         day.time_stamp = randomize_time_stamp(7, 10)
                 # TODO: This needs to be refactored into a function
                 else:
-                    if day.weekday() not in cur_proph_schedule:
+                    if day.weekday() not in current_prophey_schedule:
                         day.infused = True
                         day.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
-                        cur_proph_schedule = toggle_schedule(cur_proph_schedule)
+                        cur_proph_schedule = toggle_schedule(current_prophey_schedule)
 
                     else:
                         doses -= 1
                         day.infused = True
                         day.time_stamp = randomize_time_stamp(7, 10)
             # TODO: This needs to be refactored into a function
-            elif day.weekday() in cur_proph_schedule:
+            elif day.weekday() in current_prophey_schedule:
                 day.infused = True
                 doses -= 1
                 day.time_stamp = randomize_time_stamp(7, 10)
@@ -244,7 +244,7 @@ def fill_log():
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
 
-    full_log = add_infusions_to_log(log_with_bleeds, cur_prophey_schedule)
+    full_log = add_infusions_to_log(log_with_bleeds)
     return full_log
 
 
