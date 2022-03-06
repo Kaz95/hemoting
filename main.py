@@ -162,6 +162,8 @@ def add_infusions_to_log(some_log, cur_proph_schedule):
     for day in some_log:
         if doses > 1:
             # TODO: I think if I'm more selective on when to append, I can avoid sifting later.
+            # TODO: Append if day.bleeds_list or day.weekday() in cur_proph_schedule
+            # TODO: I think that does it.
             infusion_log.append(day)
             if day.bleeds_list:
                 yesterday_index = some_log.index(day) - 1
@@ -226,7 +228,6 @@ def get_manual_bleeds():
     return bepisode_list
 
 
-# TODO: Refactor
 # TODO: Amount of bleeds should probably be input.
 # Creates a blank log based on user inputted start date/last shipment.
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
@@ -247,6 +248,7 @@ def fill_log():
     return full_log
 
 
+# TODO: I don't think i need this at all. Sift somewhere else.
 # TODO: I think after this step is completed I can shove info right into DB, as well as output directly to CSV.
 # TODO: I can also not output to CSV following this and only ever do so from DB. I feel like direct CSV out put is worth
 # Sifts a list of Date objects for bleeds and infusions. Returns them in a new list.
