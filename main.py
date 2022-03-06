@@ -149,8 +149,8 @@ def randomize_time_stamp(start_hr, end_hr):
 
 
 # Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
-# Increments dates in list and adds them to a new list. Subtracts a dose for every infusion.
-# Finishes after 11 infusions and returns the new list.
+# Increments dates in list and adds them to a new list if they are relevant to final log.
+# Subtracts a dose for every infusion. Finishes after 11 infusions and returns the new list.
 def add_infusions_to_log(some_log):
     current_prophey_schedule = normal_prophey_schedule
     doses = 12
@@ -172,7 +172,7 @@ def add_infusions_to_log(some_log):
                         day.infused = True
                         day.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
-                        cur_proph_schedule = toggle_schedule(current_prophey_schedule)
+                        current_prophey_schedule = toggle_schedule(current_prophey_schedule)
                     # TODO: This needs to be refactored into a function
                     else:
                         doses -= 1
@@ -184,7 +184,7 @@ def add_infusions_to_log(some_log):
                         day.infused = True
                         day.time_stamp = randomize_time_stamp(7, 10)
                         doses -= 1
-                        cur_proph_schedule = toggle_schedule(current_prophey_schedule)
+                        current_prophey_schedule = toggle_schedule(current_prophey_schedule)
 
                     else:
                         doses -= 1
