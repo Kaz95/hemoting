@@ -265,13 +265,14 @@ def make_csv_title(some_log):
     start_date_string = start_date.strftime('%m-%d-%Y')
     end_date = some_log[-1]
     end_date_string = end_date.strftime('%m-%d-%Y')
-    return start_date_string, end_date_string
+    csv_title = f'{start_date_string} - {end_date_string}'
+    return csv_title
 
 
 # Used to output a sifted log to csv
 def output_to_csv(some_log):
     csv_title = make_csv_title(some_log)
-    with open(f'{csv_title[0]} - {csv_title[1]}.csv', 'x', newline='') as csv_log:
+    with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
         log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
         for day in some_log:
