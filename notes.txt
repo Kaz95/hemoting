@@ -1,0 +1,25 @@
+- I need to add a DB for persistence
+- I will use sqlite because I don't believe I need the added functionality of a more advanced DB
+    - If I can't handle dates and times as I'd like, I will look for alternative DB engine.
+- I need two Tables total, at the moment, for my proposed schema
+    - Log
+        - Will represent all relevant dates bleeds and prophylactic infusions.
+        - Date
+            - Not Null
+            - Date object?
+        - Time Stamp
+            - Time Object?
+        - Infused
+            - Not Null
+            - Bool
+        - Location
+            - String
+    - Doses
+        - Will only be used to keep trap of doses on hand persistently
+        - Date (Ties to a shipment lot)
+            - Date Object?
+- I currently already have functions that will create a list of Date objects that I want to log
+- I need to create functions to insert these objects into database.
+- After that I can adapt the program to work persistently as a whole.
+
+- To adapt the program for persistence I have to....
