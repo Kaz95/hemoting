@@ -1,6 +1,7 @@
 import datetime
 import random
 import csv
+# TODO: Currently a bleed can randomize itself passed the 11th dose, if previous bleeds cause log to hit that point.
 
 # Used to randomize bleed location. Nothing else.
 bleed_locations_list = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps']
@@ -148,6 +149,19 @@ def randomize_time_stamp(start_hr, end_hr):
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
+# Helper function for add_infusions_to_log(). Always removes a dose, sets infusion to true, and timestamps infusion.
+# If a schedule is passed in, it will be toggled.
+def infuse(some_day, doses, current_schedule=None):
+    some_day.infused = True
+    doses -= 1
+    # TODO: Customize timestamp here later.
+    some_day.timestamp = randomize_time_stamp(7, 10)
+    if current_schedule:
+        current_schedule = toggle_schedule(current_schedule)
+        return doses, current_schedule
+    return doses
+
+
 # Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
 # Increments dates in list and adds them to a new list if they are relevant to final log.
 # Subtracts a dose for every infusion. Finishes after 11 infusions and returns the new list.
@@ -155,6 +169,7 @@ def add_infusions_to_log(some_log):
     current_prophey_schedule = normal_prophey_schedule
     doses = 12
     infusion_log = []
+
     for day in some_log:
         if doses > 1:
             if day.bleeds_list:
@@ -167,35 +182,41 @@ def add_infusions_to_log(some_log):
                             continue
                     except ValueError:
                         print('index was out of range when checking prev two days, but was handled')
-                    # TODO: This needs to be refactored into a function
                     if day.weekday() not in current_prophey_schedule:
-                        day.infused = True
-                        day.time_stamp = randomize_time_stamp(7, 10)
-                        doses -= 1
-                        current_prophey_schedule = toggle_schedule(current_prophey_schedule)
-                    # TODO: This needs to be refactored into a function
+                        doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
+                        doses = doses_schedule_tuple[0]
+                        current_prophey_schedule = doses_schedule_tuple[1]
+                        # day.infused = True
+                        # day.time_stamp = randomize_time_stamp(7, 10)
+                        # doses -= 1
+                        # current_prophey_schedule = toggle_schedule(current_prophey_schedule)
                     else:
-                        doses -= 1
-                        day.infused = True
-                        day.time_stamp = randomize_time_stamp(7, 10)
-                # TODO: This needs to be refactored into a function
+                        doses = infuse(day, doses)
+                        # doses -= 1
+                        # day.infused = True
+                        # day.time_stamp = randomize_time_stamp(7, 10)
                 else:
                     if day.weekday() not in current_prophey_schedule:
-                        day.infused = True
-                        day.time_stamp = randomize_time_stamp(7, 10)
-                        doses -= 1
-                        current_prophey_schedule = toggle_schedule(current_prophey_schedule)
+                        doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
+                        doses = doses_schedule_tuple[0]
+                        current_prophey_schedule = doses_schedule_tuple[1]
+                        # day.infused = True
+                        # day.time_stamp = randomize_time_stamp(7, 10)
+                        # doses -= 1
+                        # current_prophey_schedule = toggle_schedule(current_prophey_schedule)
 
                     else:
-                        doses -= 1
-                        day.infused = True
-                        day.time_stamp = randomize_time_stamp(7, 10)
-            # TODO: This needs to be refactored into a function
+                        doses = infuse(day, doses)
+                        # doses -= 1
+                        # day.infused = True
+                        # day.time_stamp = randomize_time_stamp(7, 10)\
+
             elif day.weekday() in current_prophey_schedule:
                 infusion_log.append(day)
-                day.infused = True
-                doses -= 1
-                day.time_stamp = randomize_time_stamp(7, 10)
+                doses = infuse(day, doses)
+                # day.infused = True
+                # doses -= 1
+                # day.time_stamp = randomize_time_stamp(7, 10)
             else:
                 if day.weekday() == 6:
                     current_prophey_schedule = normal_prophey_schedule
