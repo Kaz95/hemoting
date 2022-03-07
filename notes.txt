@@ -23,3 +23,5 @@
 - After that I can adapt the program to work persistently as a whole.
 
 - To adapt the program for persistence I have to....
+- I will need to add 12 doses to Doses Table
+- Then, I will.....This is actually all wrong. I have a new idea.
