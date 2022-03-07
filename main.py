@@ -176,50 +176,37 @@ def add_infusions_to_log(some_log):
                 infusion_log.append(day)
                 yesterday_index = some_log.index(day) - 1
                 day_before_yesterday_index = some_log.index(day) - 2
+
                 if yesterday_index and day_before_yesterday_index >= 0:
                     try:
                         if some_log[yesterday_index].infused and some_log[day_before_yesterday_index].infused:
                             continue
                     except ValueError:
                         print('index was out of range when checking prev two days, but was handled')
+
                     if day.weekday() not in current_prophey_schedule:
                         doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
                         doses = doses_schedule_tuple[0]
                         current_prophey_schedule = doses_schedule_tuple[1]
-                        # day.infused = True
-                        # day.time_stamp = randomize_time_stamp(7, 10)
-                        # doses -= 1
-                        # current_prophey_schedule = toggle_schedule(current_prophey_schedule)
                     else:
                         doses = infuse(day, doses)
-                        # doses -= 1
-                        # day.infused = True
-                        # day.time_stamp = randomize_time_stamp(7, 10)
+
                 else:
                     if day.weekday() not in current_prophey_schedule:
                         doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
                         doses = doses_schedule_tuple[0]
                         current_prophey_schedule = doses_schedule_tuple[1]
-                        # day.infused = True
-                        # day.time_stamp = randomize_time_stamp(7, 10)
-                        # doses -= 1
-                        # current_prophey_schedule = toggle_schedule(current_prophey_schedule)
-
                     else:
                         doses = infuse(day, doses)
-                        # doses -= 1
-                        # day.infused = True
-                        # day.time_stamp = randomize_time_stamp(7, 10)\
 
             elif day.weekday() in current_prophey_schedule:
                 infusion_log.append(day)
                 doses = infuse(day, doses)
-                # day.infused = True
-                # doses -= 1
-                # day.time_stamp = randomize_time_stamp(7, 10)
+
             else:
                 if day.weekday() == 6:
                     current_prophey_schedule = normal_prophey_schedule
+
         # TODO is this else case even needed?
         else:
             pass
@@ -263,20 +250,6 @@ def fill_log():
     return full_log
 
 
-# Sifts a list of Date objects for bleeds and infusions. Returns them in a new list.
-# def sift_log(some_log):
-#     sifted_log = []
-#     for day in some_log:
-#         if day.bleeds_list or day.infused:
-#             sifted_log.append(day)
-#     for day in sifted_log:
-#         if day.bleeds_list:
-#             print(f'{day} - {day.infused} - {day.bleeds_list}')
-#         else:
-#             print(f'{day} - {day.infused} - Prophey')
-#     return sifted_log
-
-
 def test_print_thingo(some_log):
     for day in some_log:
         if day.bleeds_list:
@@ -315,7 +288,6 @@ def output_to_csv(some_log):
 # TODO: Times I've thought: "Damn,I should write some tests", but did not --> 1
 if __name__ == '__main__':
     log = fill_log()
-    # end_log = sift_log(log)
     test_print_thingo(log)
     output_to_csv(log)
 
