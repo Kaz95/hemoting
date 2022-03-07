@@ -259,7 +259,6 @@ def test_print_thingo(some_log):
 
 
 # Creates a string title for csv files based on first and last item in a list of Date objects.
-# TODO: I should probably just format the string here to avoid having to return a tuple.
 def make_csv_title(some_log):
     start_date = some_log[0]
     start_date_string = start_date.strftime('%m-%d-%Y')
@@ -286,7 +285,7 @@ def output_to_csv(some_log):
 
 
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 1
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 2
 if __name__ == '__main__':
     log = fill_log()
     test_print_thingo(log)
