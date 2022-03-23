@@ -4,7 +4,7 @@ import csv
 # TODO: Currently a bleed can randomize itself passed the 11th dose, if previous bleeds cause log to hit that point.
 
 # Used to randomize bleed location. Nothing else.
-bleed_locations_list = ['Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps']
+bleed_locations_list = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 # List of days of the week as used by the datetime class. Mon, Wed, Fri.
 normal_prophey_schedule = (0, 2, 4)
 # List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
