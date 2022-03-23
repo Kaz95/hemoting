@@ -81,13 +81,12 @@ class Bepisode:
 
 # Creates and returns a list of Date objects within a range based on input.
 def make_blank_log(start_date, maximum_days):
-    blank_log = [start_date]
-    temp_date = start_date
-    for _ in range(maximum_days):
-        temp_date = temp_date + datetime.timedelta(1)
-        blank_log.append(temp_date)
-        # start_date = start_date + datetime.timedelta(1)
-        # blank_log.append(start_date)
+    # blank_log = [start_date]
+    # temp_date = start_date
+    # for _ in range(maximum_days):
+    #     temp_date = temp_date + datetime.timedelta(1)
+    #     blank_log.append(temp_date)
+    blank_log = [start_date + datetime.timedelta(_) for _ in range(maximum_days + 1)]
     return blank_log
 
 
@@ -311,17 +310,21 @@ def print_menu_options():
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
 # TODO: Times I've thought: "Damn,I should write some tests", but did not --> 4
 if __name__ == '__main__':
-    while True:
-        print_menu()
-        print_menu_options()
-        selection = input('What do?: ')
-        if selection == '1':
-            log = fill_log()
-            test_print_thingo(log)
-            output_to_csv(log)
-        elif selection == '4':
-            break
-        else:
-            print('Not yet implemented.\n\n\n')
+    d = get_date()
+    log = make_blank_log(d, get_max_days(d.weekday()))
+    for _ in log:
+        print(_)
+    # while True:
+    #     print_menu()
+    #     print_menu_options()
+    #     selection = input('What do?: ')
+    #     if selection == '1':
+    #         log = fill_log()
+    #         test_print_thingo(log)
+    #         output_to_csv(log)
+    #     elif selection == '4':
+    #         break
+    #     else:
+    #         print('Not yet implemented.\n\n\n')
 
     
