@@ -163,7 +163,7 @@ def infuse(some_day, doses, current_schedule=None):
 
 
 # Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
-# Increments dates in list and adds them to a new list if they are relevant to final log.
+# Increments through dates in list and adds them to a new list if they are relevant to final log.
 # Subtracts a dose for every infusion. Finishes after 11 infusions and returns the new list.
 def add_infusions_to_log(some_log):
     current_prophey_schedule = normal_prophey_schedule
@@ -242,6 +242,7 @@ def fill_log():
     max_days = get_max_days(start_date.weekday())
     blank_log = make_blank_log(start_date, max_days)
     bepisode_list = get_manual_bleeds()
+    # TODO: Magic Number reeeee
     bepisode_list = random_all_bleed_episodes(3, start_date, max_days, bepisode_list)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
@@ -284,11 +285,43 @@ def output_to_csv(some_log):
                 log_writer.writerow([day, 'Yes', day.time_stamp, 'Prophylaxis'])
 
 
+def print_menu_border():
+    for i in range(54):
+        print('-', end="")
+
+
+def print_menu():
+    print_menu_border()
+    print('')
+    print('                        Menu                          ')
+    print_menu_border()
+
+
+def print_menu_options():
+    print()
+    print('1.) New Shipment Date')
+    print('2.) Update Bepisodes')
+    print('3.) Update Settings')
+    print('4.) Exit')
+    print_menu_border()
+    print()
+
+
+# TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 2
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 4
 if __name__ == '__main__':
-    log = fill_log()
-    test_print_thingo(log)
-    output_to_csv(log)
+    while True:
+        print_menu()
+        print_menu_options()
+        selection = input('What do?: ')
+        if selection == '1':
+            log = fill_log()
+            test_print_thingo(log)
+            output_to_csv(log)
+        elif selection == '4':
+            break
+        else:
+            print('Not yet implemented.\n\n\n')
 
     
