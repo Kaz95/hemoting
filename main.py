@@ -306,6 +306,7 @@ def print_menu_options():
     print()
 
 
+# TODO: Kill all the magic numbers
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
 # TODO: Times I've thought: "Damn,I should write some tests", but did not --> 4
