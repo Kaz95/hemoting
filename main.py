@@ -311,21 +311,17 @@ def print_menu_options():
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
 # TODO: Times I've thought: "Damn,I should write some tests", but did not --> 4
 if __name__ == '__main__':
-    d = get_date()
-    log = make_blank_log(d, get_max_days(d.weekday()))
-    for _ in log:
-        print(_)
-    # while True:
-    #     print_menu()
-    #     print_menu_options()
-    #     selection = input('What do?: ')
-    #     if selection == '1':
-    #         log = fill_log()
-    #         test_print_thingo(log)
-    #         output_to_csv(log)
-    #     elif selection == '4':
-    #         break
-    #     else:
-    #         print('Not yet implemented.\n\n\n')
+    while True:
+        print_menu()
+        print_menu_options()
+        selection = input('What do?: ')
+        if selection == '1':
+            log = fill_log()
+            test_print_thingo(log)
+            output_to_csv(log)
+        elif selection == '4':
+            break
+        else:
+            print('Not yet implemented.\n\n\n')
 
     
