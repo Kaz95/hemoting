@@ -2,6 +2,7 @@ import datetime
 import random
 import csv
 # TODO: Currently a bleed can randomize itself passed the 11th dose, if previous bleeds cause log to hit that point.
+# TODO: If infuse on friday and saturday, still bleeding on sunday so skipped, monday should be infused but is not.
 
 # Used to randomize bleed location. Nothing else.
 bleed_locations_list = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
@@ -18,16 +19,16 @@ class ScheduleHandler:
     def __init__(self, norm, alt):
         self.norm = norm
         self.alt = alt
-        self.cur = None
+        self.current_schedule = norm
 
     def toggle(self):
-        if self.cur == self.norm:
-            self.cur = self.alt
+        if self.current_schedule == self.norm:
+            self.current_schedule = self.alt
         else:
-            self.cur = self.norm
+            self.current_schedule = self.norm
 
     def reset(self):
-        self.cur = self.norm
+        self.current_schedule = self.norm
 
 
 # TODO: This could be a dataclass, or a class, or the other function implementation below.
@@ -188,7 +189,7 @@ def randomize_time_stamp(start_hr, end_hr):
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
-def infuse_with_handler(some_day, doses, schedule_handler, tog=False):
+def infuse_with_handler(some_day, doses, schedule_handler, tog=None):
     some_day.infused = True
     doses -= 1
     # TODO: Customize timestamp here later.
@@ -200,26 +201,21 @@ def infuse_with_handler(some_day, doses, schedule_handler, tog=False):
 
 # Helper function for add_infusions_to_log(). Always removes a dose, sets infusion to true, and timestamps infusion.
 # If a schedule is passed in, it will be toggled.
-def infuse(some_day, doses, current_schedule=None):
-    some_day.infused = True
-    doses -= 1
-    # TODO: Customize timestamp here later.
-    some_day.timestamp = randomize_time_stamp(7, 10)
-    if current_schedule:
-        current_schedule = toggle_schedule(current_schedule)
-        return doses, current_schedule
-    return doses
+# def infuse(some_day, doses, current_schedule=None):
+#     some_day.infused = True
+#     doses -= 1
+#     # TODO: Customize timestamp here later.
+#     some_day.timestamp = randomize_time_stamp(7, 10)
+#     if current_schedule:
+#         current_schedule = toggle_schedule(current_schedule)
+#         return doses, current_schedule
+#     return doses
 
 
-# Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
-# Increments through dates in list and adds them to a new list if they are relevant to final log.
-# Subtracts a dose for every infusion. Finishes after 11 infusions and returns the new list.
 def add_infusions_to_log(some_log):
-    current_prophey_schedule = normal_prophey_schedule
     doses = 12
     infusion_log = []
-    # schedule_handler = ScheduleHandler(normal_prophey_schedule, alt_prophey_schedule)
-
+    scheduler = ScheduleHandler(normal_prophey_schedule, alt_prophey_schedule)
     for day in some_log:
         if doses > 1:
             if day.bleeds_list:
@@ -230,38 +226,88 @@ def add_infusions_to_log(some_log):
                 if yesterday_index and day_before_yesterday_index >= 0:
                     try:
                         if some_log[yesterday_index].infused and some_log[day_before_yesterday_index].infused:
+                            if day.weekday() == 6:
+                                scheduler.toggle()
                             continue
                     except ValueError:
                         print('index was out of range when checking prev two days, but was handled')
 
-                    if day.weekday() not in current_prophey_schedule:
-                        doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
-                        doses = doses_schedule_tuple[0]
-                        current_prophey_schedule = doses_schedule_tuple[1]
+                    if day.weekday() not in scheduler.current_schedule:
+                        doses = infuse_with_handler(day, doses, scheduler, tog=True)
                     else:
-                        doses = infuse(day, doses)
+                        doses = infuse_with_handler(day, doses, scheduler)
 
                 else:
-                    if day.weekday() not in current_prophey_schedule:
-                        doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
-                        doses = doses_schedule_tuple[0]
-                        current_prophey_schedule = doses_schedule_tuple[1]
+                    if day.weekday() not in scheduler.current_schedule:
+                        doses = infuse_with_handler(day, doses, scheduler, tog=True)
                     else:
-                        doses = infuse(day, doses)
+                        doses = infuse_with_handler(day, doses, scheduler)
 
-            elif day.weekday() in current_prophey_schedule:
+            elif day.weekday() in scheduler.current_schedule:
                 infusion_log.append(day)
-                doses = infuse(day, doses)
+                doses = infuse_with_handler(day, doses, scheduler)
 
             else:
                 if day.weekday() == 6:
-                    current_prophey_schedule = normal_prophey_schedule
+                    scheduler.toggle()
 
         # TODO is this else case even needed?
         else:
             pass
 
     return infusion_log
+
+# Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
+# Increments through dates in list and adds them to a new list if they are relevant to final log.
+# Subtracts a dose for every infusion. Finishes after 11 infusions and returns the new list.
+# def add_infusions_to_log(some_log):
+#     current_prophey_schedule = normal_prophey_schedule
+#     doses = 12
+#     infusion_log = []
+#     # schedule_handler = ScheduleHandler(normal_prophey_schedule, alt_prophey_schedule)
+#
+#     for day in some_log:
+#         if doses > 1:
+#             if day.bleeds_list:
+#                 infusion_log.append(day)
+#                 yesterday_index = some_log.index(day) - 1
+#                 day_before_yesterday_index = some_log.index(day) - 2
+#
+#                 if yesterday_index and day_before_yesterday_index >= 0:
+#                     try:
+#                         if some_log[yesterday_index].infused and some_log[day_before_yesterday_index].infused:
+#                             continue
+#                     except ValueError:
+#                         print('index was out of range when checking prev two days, but was handled')
+#
+#                     if day.weekday() not in current_prophey_schedule:
+#                         doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
+#                         doses = doses_schedule_tuple[0]
+#                         current_prophey_schedule = doses_schedule_tuple[1]
+#                     else:
+#                         doses = infuse(day, doses)
+#
+#                 else:
+#                     if day.weekday() not in current_prophey_schedule:
+#                         doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
+#                         doses = doses_schedule_tuple[0]
+#                         current_prophey_schedule = doses_schedule_tuple[1]
+#                     else:
+#                         doses = infuse(day, doses)
+#
+#             elif day.weekday() in current_prophey_schedule:
+#                 infusion_log.append(day)
+#                 doses = infuse(day, doses)
+#
+#             else:
+#                 if day.weekday() == 6:
+#                     current_prophey_schedule = normal_prophey_schedule
+#
+#         # TODO is this else case even needed?
+#         else:
+#             pass
+#
+#     return infusion_log
 
 
 # Resulting list will be fed into randomize all bleed episodes function at some point. Keep them compatible.
@@ -360,7 +406,7 @@ def print_menu_options():
 # TODO: Kill all the magic numbers
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 6
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 8
 if __name__ == '__main__':
     while True:
         print_menu()
