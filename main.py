@@ -138,7 +138,7 @@ def couple_bleeds_to_dates(bepisodes_list, some_log):
 
 
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
-# The list may or may not be empty when passed in. This allows program to back fill any non manual bleeds.
+# The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
 def random_all_bleed_episodes(amount_of_bleeds, start_date, maximum_days, bepisode_list):
     while len(bepisode_list) < amount_of_bleeds:
         bepisode = randomize_bleed_episode(start_date, maximum_days)
@@ -156,7 +156,7 @@ def randomize_time_stamp(start_hr, end_hr):
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
-def infuse_with_handler(some_day, doses, schedule_handler, tog=None):
+def infuse(some_day, doses, schedule_handler, tog=False):
     some_day.infused = True
     doses -= 1
     # TODO: Customize timestamp here later.
@@ -186,19 +186,19 @@ def add_infusions_to_log(some_log):
                         print('index was out of range when checking prev two days, but was handled')
 
                     if day.weekday() not in scheduler.current_schedule:
-                        doses = infuse_with_handler(day, doses, scheduler, tog=True)
+                        doses = infuse(day, doses, scheduler, tog=True)
                     else:
-                        doses = infuse_with_handler(day, doses, scheduler)
+                        doses = infuse(day, doses, scheduler)
 
                 else:
                     if day.weekday() not in scheduler.current_schedule:
-                        doses = infuse_with_handler(day, doses, scheduler, tog=True)
+                        doses = infuse(day, doses, scheduler, tog=True)
                     else:
-                        doses = infuse_with_handler(day, doses, scheduler)
+                        doses = infuse(day, doses, scheduler)
 
             elif day.weekday() in scheduler.current_schedule:
                 infusion_log.append(day)
-                doses = infuse_with_handler(day, doses, scheduler)
+                doses = infuse(day, doses, scheduler)
 
             else:
                 if day.weekday() == 6:
