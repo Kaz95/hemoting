@@ -157,7 +157,8 @@ def randomize_bleed_episode(start_date, maximum_days):
 
 # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding date object in given list.
 # If one is found, the date object will have its bleed list updated with a string
-# The string represents the location of the aforementioned bleed
+# The string represents the location of the aforementioned bleed\
+# TODO: What happens if it doesnt find a corresponding date object?
 def couple_bleeds_to_dates(bepisodes_list, some_log):
     for bepisode in bepisodes_list:
         for day in bepisode.dates_list:
