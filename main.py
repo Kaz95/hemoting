@@ -5,10 +5,48 @@ import csv
 
 # Used to randomize bleed location. Nothing else.
 bleed_locations_list = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
+
+# TODO: These schedules will be saved in settings and injected into an instance of ScheduleHandler at runtime.
+# TODO: Leaving them here for now for easier testing until settings JSON is created.
 # List of days of the week as used by the datetime class. Mon, Wed, Fri.
 normal_prophey_schedule = (0, 2, 4)
 # List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
 alt_prophey_schedule = (1, 3, 5)
+
+
+class ScheduleHandler:
+    def __init__(self, norm, alt):
+        self.norm = norm
+        self.alt = alt
+        self.cur = None
+
+    def toggle(self):
+        if self.cur == self.norm:
+            self.cur = self.alt
+        else:
+            self.cur = self.norm
+
+    def reset(self):
+        self.cur = self.norm
+
+
+# TODO: This could be a dataclass, or a class, or the other function implementation below.
+# TODO: They all work the same as this closure implementation.
+def make_schedule_handler(norm, alt):
+    schedule_handler = {'cur': norm}
+
+    def toggle():
+        if schedule_handler['cur'] == norm:
+            schedule_handler['cur'] = alt
+        else:
+            schedule_handler['cur'] = norm
+
+    def reset():
+        schedule_handler['cur'] = norm
+
+    schedule_handler['reset'] = reset
+    schedule_handler['tog'] = toggle
+    return schedule_handler
 
 
 # Toggles between Normal and alternative prophey schedules.
@@ -64,6 +102,7 @@ def get_max_days(start_wkday):
     return maximum_days
 
 
+# TODO: This should be a dataclass and operated on by a general function. More reusable.
 # Class to encapsulate the data pertaining to a given bleeding episode.
 class Bepisode:
     def __init__(self, start_date, location, duration):
@@ -72,6 +111,7 @@ class Bepisode:
         self.duration = duration
         self.dates_list = []
 
+    # TODO: This should be list comprehension like make blank log, and also it does the same shit.
     # Method that projects days bled, based on duration and start date.
     def project_dates(self):
         for _ in range(self.duration):
@@ -86,7 +126,7 @@ def make_blank_log(start_date, maximum_days):
     # for _ in range(maximum_days):
     #     temp_date = temp_date + datetime.timedelta(1)
     #     blank_log.append(temp_date)
-    blank_log = [start_date + datetime.timedelta(_) for _ in range(maximum_days + 1)]
+    blank_log = [start_date + datetime.timedelta(_) for _ in range(maximum_days)]
     return blank_log
 
 
@@ -148,6 +188,16 @@ def randomize_time_stamp(start_hr, end_hr):
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
+def infuse_with_handler(some_day, doses, schedule_handler, tog=False):
+    some_day.infused = True
+    doses -= 1
+    # TODO: Customize timestamp here later.
+    some_day.timestamp = randomize_time_stamp(7, 10)
+    if tog:
+        schedule_handler.toggle()
+    return doses
+
+
 # Helper function for add_infusions_to_log(). Always removes a dose, sets infusion to true, and timestamps infusion.
 # If a schedule is passed in, it will be toggled.
 def infuse(some_day, doses, current_schedule=None):
@@ -168,6 +218,7 @@ def add_infusions_to_log(some_log):
     current_prophey_schedule = normal_prophey_schedule
     doses = 12
     infusion_log = []
+    # schedule_handler = ScheduleHandler(normal_prophey_schedule, alt_prophey_schedule)
 
     for day in some_log:
         if doses > 1:
@@ -309,7 +360,7 @@ def print_menu_options():
 # TODO: Kill all the magic numbers
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 4
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 6
 if __name__ == '__main__':
     while True:
         print_menu()
