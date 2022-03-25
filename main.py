@@ -15,6 +15,21 @@ normal_prophey_schedule = (0, 2, 4)
 alt_prophey_schedule = (1, 3, 5)
 
 
+# TODO: Consider using date object instead of datetime
+# TODO: Haven't changed it yet because not sure if sqlite requires a full date time object or just a date will do.
+# Extended datetime object. Always me to couple bleeds, infusions, and infusion timestamps to a given date.
+class Date(datetime.datetime):
+
+    def __new__(cls, year, month, day, hour, minute, second, microsecond, tzinfo, infusion=None):
+        return super().__new__(cls, year=year, month=month, day=day, hour=hour, minute=minute, second=second, microsecond=microsecond, tzinfo=tzinfo)
+
+    def __init__(self, year, month, day, hour, minute, second, microsecond, tzinfo, infused=False):
+        super().__init__()
+        self.bleeds_list = []
+        self.infused = infused
+        self.time_stamp = None
+
+
 class ScheduleHandler:
     def __init__(self, norm, alt):
         self.norm = norm
@@ -31,48 +46,21 @@ class ScheduleHandler:
         self.current_schedule = self.norm
 
 
-# TODO: This could be a dataclass, or a class, or the other function implementation below.
-# TODO: They all work the same as this closure implementation.
-def make_schedule_handler(norm, alt):
-    schedule_handler = {'cur': norm}
+# TODO: This should be a dataclass and operated on by a general function. More reusable.
+# Class to encapsulate the data pertaining to a given bleeding episode.
+class Bepisode:
+    def __init__(self, start_date, location, duration):
+        self.start_date = start_date
+        self.location = location
+        self.duration = duration
+        self.dates_list = []
 
-    def toggle():
-        if schedule_handler['cur'] == norm:
-            schedule_handler['cur'] = alt
-        else:
-            schedule_handler['cur'] = norm
-
-    def reset():
-        schedule_handler['cur'] = norm
-
-    schedule_handler['reset'] = reset
-    schedule_handler['tog'] = toggle
-    return schedule_handler
-
-
-# Toggles between Normal and alternative prophey schedules.
-# Will always output the schedule tht is not currently selected
-def toggle_schedule(schedule):
-    if schedule == normal_prophey_schedule:
-        schedule = alt_prophey_schedule
-    else:
-        schedule = normal_prophey_schedule
-    return schedule
-
-
-# TODO: Consider using date object instead of datetime
-# TODO: Haven't changed it yet because not sure if sqlite requires a full date time object or just a date will do.
-# Extended datetime object. Always me to couple bleeds, infusions, and infusion timestamps to a given date.
-class Date(datetime.datetime):
-
-    def __new__(cls, year, month, day, hour, minute, second, microsecond, tzinfo, infusion=None):
-        return super().__new__(cls, year=year, month=month, day=day, hour=hour, minute=minute, second=second, microsecond=microsecond, tzinfo=tzinfo)
-
-    def __init__(self, year, month, day, hour, minute, second, microsecond, tzinfo, infused=False):
-        super().__init__()
-        self.bleeds_list = []
-        self.infused = infused
-        self.time_stamp = None
+    # TODO: This should be list comprehension like make blank log, and also it does the same shit.
+    # Method that projects days bled, based on duration and start date.
+    def project_dates(self):
+        for _ in range(self.duration):
+            projected_date = self.start_date + datetime.timedelta(_)
+            self.dates_list.append(projected_date)
 
 
 # Gets user input for year, date, and month. Coverts to integers and creates a Date object.
@@ -103,30 +91,8 @@ def get_max_days(start_wkday):
     return maximum_days
 
 
-# TODO: This should be a dataclass and operated on by a general function. More reusable.
-# Class to encapsulate the data pertaining to a given bleeding episode.
-class Bepisode:
-    def __init__(self, start_date, location, duration):
-        self.start_date = start_date
-        self.location = location
-        self.duration = duration
-        self.dates_list = []
-
-    # TODO: This should be list comprehension like make blank log, and also it does the same shit.
-    # Method that projects days bled, based on duration and start date.
-    def project_dates(self):
-        for _ in range(self.duration):
-            projected_date = self.start_date + datetime.timedelta(_)
-            self.dates_list.append(projected_date)
-
-
 # Creates and returns a list of Date objects within a range based on input.
 def make_blank_log(start_date, maximum_days):
-    # blank_log = [start_date]
-    # temp_date = start_date
-    # for _ in range(maximum_days):
-    #     temp_date = temp_date + datetime.timedelta(1)
-    #     blank_log.append(temp_date)
     blank_log = [start_date + datetime.timedelta(_) for _ in range(maximum_days)]
     return blank_log
 
@@ -200,19 +166,6 @@ def infuse_with_handler(some_day, doses, schedule_handler, tog=None):
     return doses
 
 
-# Helper function for add_infusions_to_log(). Always removes a dose, sets infusion to true, and timestamps infusion.
-# If a schedule is passed in, it will be toggled.
-# def infuse(some_day, doses, current_schedule=None):
-#     some_day.infused = True
-#     doses -= 1
-#     # TODO: Customize timestamp here later.
-#     some_day.timestamp = randomize_time_stamp(7, 10)
-#     if current_schedule:
-#         current_schedule = toggle_schedule(current_schedule)
-#         return doses, current_schedule
-#     return doses
-
-
 def add_infusions_to_log(some_log):
     doses = 12
     infusion_log = []
@@ -223,7 +176,6 @@ def add_infusions_to_log(some_log):
                 infusion_log.append(day)
                 yesterday_index = some_log.index(day) - 1
                 day_before_yesterday_index = some_log.index(day) - 2
-
                 if yesterday_index and day_before_yesterday_index >= 0:
                     try:
                         if some_log[yesterday_index].infused and some_log[day_before_yesterday_index].infused:
@@ -257,58 +209,6 @@ def add_infusions_to_log(some_log):
             pass
 
     return infusion_log
-
-# Meat and potatoes algorithm. Decides if a given date in a list of dates will trigger an infusion.
-# Increments through dates in list and adds them to a new list if they are relevant to final log.
-# Subtracts a dose for every infusion. Finishes after 11 infusions and returns the new list.
-# def add_infusions_to_log(some_log):
-#     current_prophey_schedule = normal_prophey_schedule
-#     doses = 12
-#     infusion_log = []
-#     # schedule_handler = ScheduleHandler(normal_prophey_schedule, alt_prophey_schedule)
-#
-#     for day in some_log:
-#         if doses > 1:
-#             if day.bleeds_list:
-#                 infusion_log.append(day)
-#                 yesterday_index = some_log.index(day) - 1
-#                 day_before_yesterday_index = some_log.index(day) - 2
-#
-#                 if yesterday_index and day_before_yesterday_index >= 0:
-#                     try:
-#                         if some_log[yesterday_index].infused and some_log[day_before_yesterday_index].infused:
-#                             continue
-#                     except ValueError:
-#                         print('index was out of range when checking prev two days, but was handled')
-#
-#                     if day.weekday() not in current_prophey_schedule:
-#                         doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
-#                         doses = doses_schedule_tuple[0]
-#                         current_prophey_schedule = doses_schedule_tuple[1]
-#                     else:
-#                         doses = infuse(day, doses)
-#
-#                 else:
-#                     if day.weekday() not in current_prophey_schedule:
-#                         doses_schedule_tuple = infuse(day, doses, current_prophey_schedule)
-#                         doses = doses_schedule_tuple[0]
-#                         current_prophey_schedule = doses_schedule_tuple[1]
-#                     else:
-#                         doses = infuse(day, doses)
-#
-#             elif day.weekday() in current_prophey_schedule:
-#                 infusion_log.append(day)
-#                 doses = infuse(day, doses)
-#
-#             else:
-#                 if day.weekday() == 6:
-#                     current_prophey_schedule = normal_prophey_schedule
-#
-#         # TODO is this else case even needed?
-#         else:
-#             pass
-#
-#     return infusion_log
 
 
 # Resulting list will be fed into randomize all bleed episodes function at some point. Keep them compatible.
