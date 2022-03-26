@@ -1,22 +1,16 @@
 import datetime
 import random
 import csv
-# TODO: Currently a bleed can randomize itself passed the 11th dose, if previous bleeds cause log to hit that point.
-# TODO: If infuse on friday and saturday, still bleeding on sunday so skipped, monday should be infused but is not.
 
 # Used to randomize bleed location. Nothing else.
 bleed_locations_list = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
-# TODO: These schedules will be saved in settings and injected into an instance of ScheduleHandler at runtime.
-# TODO: Leaving them here for now for easier testing until settings JSON is created.
 # List of days of the week as used by the datetime class. Mon, Wed, Fri.
 normal_prophey_schedule = (0, 2, 4)
 # List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
 alt_prophey_schedule = (1, 3, 5)
 
 
-# TODO: Consider using date object instead of datetime
-# TODO: Haven't changed it yet because not sure if sqlite requires a full date time object or just a date will do.
 # Extended datetime object. Always me to couple bleeds, infusions, and infusion timestamps to a given date.
 class Date(datetime.datetime):
 
@@ -46,7 +40,6 @@ class ScheduleHandler:
         self.current_schedule = self.norm
 
 
-# TODO: This should be a dataclass and operated on by a general function. More reusable.
 # Class to encapsulate the data pertaining to a given bleeding episode.
 class Bepisode:
     def __init__(self, start_date, location, duration):
@@ -55,7 +48,6 @@ class Bepisode:
         self.duration = duration
         self.dates_list = []
 
-    # TODO: This should be list comprehension like make blank log, and also it does the same shit.
     # Method that projects days bled, based on duration and start date.
     def project_dates(self):
         for _ in range(self.duration):
@@ -124,7 +116,6 @@ def randomize_bleed_episode(start_date, maximum_days):
 # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding date object in given list.
 # If one is found, the date object will have its bleed list updated with a string
 # The string represents the location of the aforementioned bleed\
-# TODO: What happens if it doesnt find a corresponding date object?
 def couple_bleeds_to_dates(bepisodes_list, some_log):
     for bepisode in bepisodes_list:
         for day in bepisode.dates_list:
@@ -159,7 +150,6 @@ def randomize_time_stamp(start_hr, end_hr):
 def infuse(some_day, doses, schedule_handler, tog=False):
     some_day.infused = True
     doses -= 1
-    # TODO: Customize timestamp here later.
     some_day.timestamp = randomize_time_stamp(7, 10)
     if tog:
         schedule_handler.toggle()
@@ -227,7 +217,6 @@ def get_manual_bleeds():
     return bepisode_list
 
 
-# TODO: Amount of bleeds should probably be input.
 # Creates a blank log based on user inputted start date/last shipment.
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
@@ -239,7 +228,6 @@ def fill_log():
     max_days = get_max_days(start_date.weekday())
     blank_log = make_blank_log(start_date, max_days)
     bepisode_list = get_manual_bleeds()
-    # TODO: Magic Number reeeee
     bepisode_list = random_all_bleed_episodes(3, start_date, max_days, bepisode_list)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
@@ -304,10 +292,9 @@ def print_menu_options():
     print()
 
 
-# TODO: Kill all the magic numbers
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 8
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 11
 if __name__ == '__main__':
     while True:
         print_menu()
