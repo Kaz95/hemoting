@@ -232,9 +232,7 @@ def get_manual_bleeds() -> list:
 # TODO: I need to break this down a bit. Inputs should be separate from log generation at the least.
 def generate_log() -> list:
     start_date = get_date()
-    formatted_date = start_date.strftime('%A - %m/%d/%Y')\
 
-    print(formatted_date)
     max_days = get_max_days(start_date.weekday())
     blank_log = make_blank_log(start_date, max_days)
     bepisode_list = get_manual_bleeds()
@@ -307,7 +305,7 @@ def print_menu_options() -> None:
 
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 13
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 16
 if __name__ == '__main__':
     while True:
         print_menu_header()
