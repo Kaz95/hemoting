@@ -5,9 +5,9 @@ import csv
 # Used to randomize bleed location. Nothing else.
 bleed_locations_list = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
-# List of days of the week as used by the datetime class. Mon, Wed, Fri.
+# Tuple of days of the week as used by the datetime class. Mon, Wed, Fri. Used as a schedule representation.
 normal_prophey_schedule = (0, 2, 4)
-# List of days of the week as referenced by the datetime class. Tue, Thur, Sat.
+# Tuple of days of the week as referenced by the datetime class. Tue, Thur, Sat. Used as a schedule representation.
 alt_prophey_schedule = (1, 3, 5)
 
 
@@ -24,6 +24,7 @@ class Date(datetime.datetime):
         self.time_stamp = None
 
 
+# A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
 class ScheduleHandler:
     def __init__(self, norm, alt):
         self.norm = norm
@@ -55,7 +56,7 @@ class Bepisode:
             self.dates_list.append(projected_date)
 
 
-# Gets user input for year, date, and month. Coverts to integers and creates a Date object.
+# Gets user input and creates a Date object.
 def get_date():
     year = int(input('Input Year XXXX: '))
     month = int(input('Input Month X(X): '))
@@ -89,6 +90,8 @@ def make_blank_log(start_date, maximum_days):
     return blank_log
 
 
+# TODO: Figure out wtf type of object are expected as params. Type hinting please.
+# Randomizes an.....object.. within a given range of dates.
 def randomize_bleed_episode_start(start_date, maximum_days_added):
     days_added = random.randrange(1, maximum_days_added)
     bleed_start_date = start_date + datetime.timedelta(days_added)
@@ -113,9 +116,9 @@ def randomize_bleed_episode(start_date, maximum_days):
     return Bepisode(bleed_start_date, location, duration)
 
 
-# Checks each date that bleeding occurred in each bepisode and tries to find a corresponding date object in given list.
-# If one is found, the date object will have its bleed list updated with a string
-# The string represents the location of the aforementioned bleed\
+# Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
+# If one is found, the Date object will have its bleed list updated with a string.
+# The string represents the location of the aforementioned bleed.
 def couple_bleeds_to_dates(bepisodes_list, some_log):
     for bepisode in bepisodes_list:
         for day in bepisode.dates_list:
@@ -147,6 +150,8 @@ def randomize_time_stamp(start_hr, end_hr):
     return datetime.time(hour=rand_hr, minute=rand_minute)
 
 
+# Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
+# TODO: Could this be defined inside add_infusions_to_log()???
 def infuse(some_day, doses, schedule_handler, tog=False):
     some_day.infused = True
     doses -= 1
@@ -156,6 +161,10 @@ def infuse(some_day, doses, schedule_handler, tog=False):
     return doses
 
 
+# Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
+# Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
+# A new list will be created with Date objects that meet certain criteria.
+# Criteria includes: Was infused, had corresponding Bepisode, or both.
 def add_infusions_to_log(some_log):
     doses = 12
     infusion_log = []
@@ -201,7 +210,7 @@ def add_infusions_to_log(some_log):
     return infusion_log
 
 
-# Resulting list will be fed into randomize all bleed episodes function at some point. Keep them compatible.
+# Resulting list will be fed into randomize_all_bleed_episodes function at some point. Keep them compatible.
 def get_manual_bleeds():
     bepisode_list = []
     while True:
@@ -220,6 +229,7 @@ def get_manual_bleeds():
 # Creates a blank log based on user inputted start date/last shipment.
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
+# Pretty much everything outside of creating a csv.
 def fill_log():
     start_date = get_date()
     formatted_date = start_date.strftime('%A - %m/%d/%Y')\
@@ -236,6 +246,7 @@ def fill_log():
     return full_log
 
 
+# Used to visualize final log output, without having to check csv(or later DB)
 def test_print_thingo(some_log):
     for day in some_log:
         if day.bleeds_list:
@@ -270,11 +281,13 @@ def output_to_csv(some_log):
                 log_writer.writerow([day, 'Yes', day.time_stamp, 'Prophylaxis'])
 
 
+# Helper function to print out a CLI menu
 def print_menu_border():
     for i in range(54):
         print('-', end="")
 
 
+# Prints temporary CLI menu
 def print_menu():
     print_menu_border()
     print('')
