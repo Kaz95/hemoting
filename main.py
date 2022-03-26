@@ -90,8 +90,7 @@ def make_blank_log(start_date: Date, maximum_days: int) -> list:
     return blank_log
 
 
-# TODO: Figure out wtf type of object are expected as params. Type hinting please.
-# Randomizes an.....object.. within a given range of dates.
+# Randomizes a Date object within a given range of dates.
 def randomize_bleed_episode_start(start_date: Date, maximum_days_added: int) -> Date:
     days_added = random.randrange(1, maximum_days_added)
     bleed_start_date = start_date + datetime.timedelta(days_added)
@@ -133,7 +132,7 @@ def couple_bleeds_to_dates(bepisodes_list: list, some_log: list) -> list:
 
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
 # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
-def random_all_bleed_episodes(amount_of_bleeds: int, start_date: Date, maximum_days: int, bepisode_list: list) -> list:
+def randomize_bleed_episodes(amount_of_bleeds: int, start_date: Date, maximum_days: int, bepisode_list: list) -> list:
     while len(bepisode_list) < amount_of_bleeds:
         bepisode = randomize_bleed_episode(start_date, maximum_days)
         bepisode_list.append(bepisode)
@@ -230,7 +229,8 @@ def get_manual_bleeds() -> list:
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
-def fill_log() -> list:
+# TODO: I need to break this down a bit. Inputs should be separate from log generation at the least.
+def generate_log() -> list:
     start_date = get_date()
     formatted_date = start_date.strftime('%A - %m/%d/%Y')\
 
@@ -238,7 +238,7 @@ def fill_log() -> list:
     max_days = get_max_days(start_date.weekday())
     blank_log = make_blank_log(start_date, max_days)
     bepisode_list = get_manual_bleeds()
-    bepisode_list = random_all_bleed_episodes(3, start_date, max_days, bepisode_list)
+    bepisode_list = randomize_bleed_episodes(3, start_date, max_days, bepisode_list)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
 
@@ -247,7 +247,7 @@ def fill_log() -> list:
 
 
 # Used to visualize final log output, without having to check csv(or later DB)
-def test_print_thingo(some_log: list) -> None:
+def print_log(some_log: list) -> None:
     for day in some_log:
         if day.bleeds_list:
             print(f'{day} - {day.infused} - {day.bleeds_list}')
@@ -288,7 +288,7 @@ def print_menu_border() -> None:
 
 
 # Prints temporary CLI menu
-def print_menu() -> None:
+def print_menu_header() -> None:
     print_menu_border()
     print('')
     print('                        Menu                          ')
@@ -310,12 +310,12 @@ def print_menu_options() -> None:
 # TODO: Times I've thought: "Damn,I should write some tests", but did not --> 13
 if __name__ == '__main__':
     while True:
-        print_menu()
+        print_menu_header()
         print_menu_options()
         selection = input('What do?: ')
         if selection == '1':
-            log = fill_log()
-            test_print_thingo(log)
+            log = generate_log()
+            print_log(log)
             output_to_csv(log)
         elif selection == '4':
             break
