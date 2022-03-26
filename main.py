@@ -132,7 +132,7 @@ def couple_bleeds_to_dates(bepisodes_list: list, some_log: list) -> list:
 
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
 # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
-def randomize_bleed_episodes(amount_of_bleeds: int, start_date: Date, maximum_days: int, bepisode_list: list) -> list:
+def fill_bepisode_list(amount_of_bleeds: int, start_date: Date, maximum_days: int, bepisode_list: list) -> list:
     while len(bepisode_list) < amount_of_bleeds:
         bepisode = randomize_bleed_episode(start_date, maximum_days)
         bepisode_list.append(bepisode)
@@ -225,21 +225,25 @@ def get_manual_bleeds() -> list:
     return bepisode_list
 
 
+def get_all_inputs() -> tuple[Date, list]:
+    start_date = get_date()
+    bepisode_list = get_manual_bleeds()
+    return start_date, bepisode_list
+
+
 # Creates a blank log based on user inputted start date/last shipment.
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
 # TODO: I need to break this down a bit. Inputs should be separate from log generation at the least.
 def generate_log() -> list:
-    start_date = get_date()
-
+    start_date, manual_bepisodes = get_all_inputs()
     max_days = get_max_days(start_date.weekday())
+
+    bepisode_list = fill_bepisode_list(3, start_date, max_days, manual_bepisodes)
     blank_log = make_blank_log(start_date, max_days)
-    bepisode_list = get_manual_bleeds()
-    bepisode_list = randomize_bleed_episodes(3, start_date, max_days, bepisode_list)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
-
     full_log = add_infusions_to_log(log_with_bleeds)
     return full_log
 
@@ -305,7 +309,7 @@ def print_menu_options() -> None:
 
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 17
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 19
 if __name__ == '__main__':
     while True:
         print_menu_header()
