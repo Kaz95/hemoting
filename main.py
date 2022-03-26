@@ -31,13 +31,13 @@ class ScheduleHandler:
         self.alt = alt
         self.current_schedule = norm
 
-    def toggle(self):
+    def toggle(self) -> None:
         if self.current_schedule == self.norm:
             self.current_schedule = self.alt
         else:
             self.current_schedule = self.norm
 
-    def reset(self):
+    def reset(self) -> None:
         self.current_schedule = self.norm
 
 
@@ -50,14 +50,14 @@ class Bepisode:
         self.dates_list = []
 
     # Method that projects days bled, based on duration and start date.
-    def project_dates(self):
+    def project_dates(self) -> None:
         for _ in range(self.duration):
             projected_date = self.start_date + datetime.timedelta(_)
             self.dates_list.append(projected_date)
 
 
 # Gets user input and creates a Date object.
-def get_date():
+def get_date() -> Date:
     year = int(input('Input Year XXXX: '))
     month = int(input('Input Month X(X): '))
     day = int(input('Input Day X(X): '))
@@ -68,7 +68,7 @@ def get_date():
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # Figured out by hand, consider how I could have done this using math.
-def get_max_days(start_wkday):
+def get_max_days(start_wkday: int) -> int:
     maximum_days = 21
     # Mon or Wed
     if start_wkday in [0, 2]:
@@ -85,31 +85,31 @@ def get_max_days(start_wkday):
 
 
 # Creates and returns a list of Date objects within a range based on input.
-def make_blank_log(start_date, maximum_days):
+def make_blank_log(start_date: Date, maximum_days: int) -> list:
     blank_log = [start_date + datetime.timedelta(_) for _ in range(maximum_days)]
     return blank_log
 
 
 # TODO: Figure out wtf type of object are expected as params. Type hinting please.
 # Randomizes an.....object.. within a given range of dates.
-def randomize_bleed_episode_start(start_date, maximum_days_added):
+def randomize_bleed_episode_start(start_date: Date, maximum_days_added: int) -> Date:
     days_added = random.randrange(1, maximum_days_added)
     bleed_start_date = start_date + datetime.timedelta(days_added)
     return bleed_start_date
 
 
 # Chooses and returns a random string from bleed locations list
-def randomize_bleed_location():
+def randomize_bleed_location() -> str:
     bleed_location_index = random.randrange(len(bleed_locations_list))
     bleed_location_string = bleed_locations_list[bleed_location_index]
     return bleed_location_string
 
 
-def randomize_bleed_duration():
+def randomize_bleed_duration() -> int:
     return random.randrange(1, 5)
 
 
-def randomize_bleed_episode(start_date, maximum_days):
+def randomize_bleed_episode(start_date: Date, maximum_days: int) -> Bepisode:
     bleed_start_date = randomize_bleed_episode_start(start_date, maximum_days)
     location = randomize_bleed_location()
     duration = randomize_bleed_duration()
@@ -119,7 +119,7 @@ def randomize_bleed_episode(start_date, maximum_days):
 # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
 # If one is found, the Date object will have its bleed list updated with a string.
 # The string represents the location of the aforementioned bleed.
-def couple_bleeds_to_dates(bepisodes_list, some_log):
+def couple_bleeds_to_dates(bepisodes_list: list, some_log: list) -> list:
     for bepisode in bepisodes_list:
         for day in bepisode.dates_list:
             try:
@@ -133,7 +133,7 @@ def couple_bleeds_to_dates(bepisodes_list, some_log):
 
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
 # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
-def random_all_bleed_episodes(amount_of_bleeds, start_date, maximum_days, bepisode_list):
+def random_all_bleed_episodes(amount_of_bleeds: int, start_date: Date, maximum_days: int, bepisode_list: list) -> list:
     while len(bepisode_list) < amount_of_bleeds:
         bepisode = randomize_bleed_episode(start_date, maximum_days)
         bepisode_list.append(bepisode)
@@ -144,7 +144,7 @@ def random_all_bleed_episodes(amount_of_bleeds, start_date, maximum_days, bepiso
 
 
 # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
-def randomize_time_stamp(start_hr, end_hr):
+def randomize_time_stamp(start_hr: int, end_hr: int) -> datetime.time:
     rand_hr = random.randrange(start_hr, (end_hr + 1))
     rand_minute = random.randrange(1, 60)
     return datetime.time(hour=rand_hr, minute=rand_minute)
@@ -152,7 +152,7 @@ def randomize_time_stamp(start_hr, end_hr):
 
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
 # TODO: Could this be defined inside add_infusions_to_log()???
-def infuse(some_day, doses, schedule_handler, tog=False):
+def infuse(some_day: Date, doses: int, schedule_handler: ScheduleHandler, tog: bool = False) -> int:
     some_day.infused = True
     doses -= 1
     some_day.timestamp = randomize_time_stamp(7, 10)
@@ -165,7 +165,7 @@ def infuse(some_day, doses, schedule_handler, tog=False):
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
 # A new list will be created with Date objects that meet certain criteria.
 # Criteria includes: Was infused, had corresponding Bepisode, or both.
-def add_infusions_to_log(some_log):
+def add_infusions_to_log(some_log: list) -> list:
     doses = 12
     infusion_log = []
     scheduler = ScheduleHandler(normal_prophey_schedule, alt_prophey_schedule)
@@ -211,7 +211,7 @@ def add_infusions_to_log(some_log):
 
 
 # Resulting list will be fed into randomize_all_bleed_episodes function at some point. Keep them compatible.
-def get_manual_bleeds():
+def get_manual_bleeds() -> list:
     bepisode_list = []
     while True:
         answer = input('Add Manual Bepisode? ')
@@ -230,7 +230,7 @@ def get_manual_bleeds():
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
-def fill_log():
+def fill_log() -> list:
     start_date = get_date()
     formatted_date = start_date.strftime('%A - %m/%d/%Y')\
 
@@ -247,7 +247,7 @@ def fill_log():
 
 
 # Used to visualize final log output, without having to check csv(or later DB)
-def test_print_thingo(some_log):
+def test_print_thingo(some_log: list) -> None:
     for day in some_log:
         if day.bleeds_list:
             print(f'{day} - {day.infused} - {day.bleeds_list}')
@@ -256,7 +256,7 @@ def test_print_thingo(some_log):
 
 
 # Creates a string title for csv files based on first and last item in a list of Date objects.
-def make_csv_title(some_log):
+def make_csv_title(some_log: list) -> str:
     start_date = some_log[0]
     start_date_string = start_date.strftime('%m-%d-%Y')
     end_date = some_log[-1]
@@ -266,7 +266,7 @@ def make_csv_title(some_log):
 
 
 # Used to output a sifted log to csv
-def output_to_csv(some_log):
+def output_to_csv(some_log: list) -> None:
     csv_title = make_csv_title(some_log)
     with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
@@ -282,20 +282,20 @@ def output_to_csv(some_log):
 
 
 # Helper function to print out a CLI menu
-def print_menu_border():
+def print_menu_border() -> None:
     for i in range(54):
         print('-', end="")
 
 
 # Prints temporary CLI menu
-def print_menu():
+def print_menu() -> None:
     print_menu_border()
     print('')
     print('                        Menu                          ')
     print_menu_border()
 
 
-def print_menu_options():
+def print_menu_options() -> None:
     print()
     print('1.) New Shipment Date')
     print('2.) Update Bepisodes')
@@ -307,7 +307,7 @@ def print_menu_options():
 
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 11
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 13
 if __name__ == '__main__':
     while True:
         print_menu()
