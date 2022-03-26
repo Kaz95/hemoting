@@ -200,7 +200,7 @@ def add_infusions_to_log(some_log: list) -> list:
 
             else:
                 if day.weekday() == 6:
-                    scheduler.toggle()
+                    scheduler.reset()
 
         # TODO is this else case even needed?
         else:
