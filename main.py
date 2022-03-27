@@ -41,6 +41,8 @@ class ScheduleHandler:
         self.current_schedule = self.normal_schedule
 
 
+# TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
+# TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
 # Class to encapsulate the data pertaining to a given bleeding episode.
 class Bepisode:
     def __init__(self, start_date, location, duration):
