@@ -274,20 +274,21 @@ def make_csv_title(log: list) -> str:
     return csv_title
 
 
+# TODO: I'm pretty sure I pass in a list of ONLY relevant dates already due to previous changes. Look into it.
 # Used to output a sifted log to csv
-def output_to_csv(some_log: list) -> None:
-    csv_title = make_csv_title(some_log)
+def output_log_to_csv(log: list) -> None:
+    csv_title = make_csv_title(log)
     with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
         log_writer = csv.writer(csv_log)
         log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
-        for day in some_log:
-            if day.bleeds_list:
-                if day.infused:
-                    log_writer.writerow([day, 'Yes', day.time_stamp, day.bleeds_list])
+        for date in log:
+            if date.bleeds_list:
+                if date.infused:
+                    log_writer.writerow([date, 'Yes', date.time_stamp, date.bleeds_list])
                 else:
-                    log_writer.writerow([day, 'No', 'N/A', day.bleeds_list])
+                    log_writer.writerow([date, 'No', 'N/A', date.bleeds_list])
             else:
-                log_writer.writerow([day, 'Yes', day.time_stamp, 'Prophylaxis'])
+                log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
 
 
 # Helper function to print out a CLI menu
@@ -314,22 +315,24 @@ def print_menu_options() -> None:
     print()
 
 
+def main() -> None:
+    while True:
+        print_menu_header()
+        print_menu_options()
+        selection = input('What do?: ')
+        if selection == '1':
+            log = generate_log()
+            print_log(log)
+            output_log_to_csv(log)
+        elif selection == '4':
+            break
+        else:
+            print('Not yet implemented.\n\n\n')
+
+
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 20
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 21
 if __name__ == '__main__':
-    def main() -> None:
-        while True:
-            print_menu_header()
-            print_menu_options()
-            selection = input('What do?: ')
-            if selection == '1':
-                log = generate_log()
-                print_log(log)
-                output_to_csv(log)
-            elif selection == '4':
-                break
-            else:
-                print('Not yet implemented.\n\n\n')
-
+    main()
     
