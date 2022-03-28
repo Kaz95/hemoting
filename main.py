@@ -29,6 +29,12 @@ class Date(datetime.date):
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
 class ScheduleHandler:
+    schedule = tuple[int, int, int]
+
+    normal_prophey_schedule: schedule
+    alternative_prophey_schedule: schedule
+    current_schedule: schedule
+
     def __init__(self, normal_schedule, alternate_schedule):
         self.normal_schedule = normal_schedule
         self.alternate_schedule = alternate_schedule
