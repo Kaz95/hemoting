@@ -94,7 +94,7 @@ def get_date() -> Date:
 
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
-# Figured out by hand, consider how I could have done this using math.
+# TODO: Figured out by hand, consider how I could have done this using math.
 def get_max_days(starting_weekday: int) -> int:
     maximum_possible_days = 21
     # Mon or Wed
