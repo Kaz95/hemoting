@@ -349,7 +349,7 @@ def main() -> None:
 
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 22
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 23
 if __name__ == '__main__':
     main()
 
