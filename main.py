@@ -11,7 +11,7 @@ normal_prophey_schedule = (0, 2, 4)
 alternative_prophey_schedule = (1, 3, 5)
 
 
-# Extended datetime object. Always me to couple bleeds, infusions, and infusion timestamps to a given date.
+# Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
 class Date(datetime.date):
 
     def __new__(cls, *arg, **kwargs):
