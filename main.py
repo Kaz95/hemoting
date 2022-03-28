@@ -11,6 +11,7 @@ normal_prophey_schedule = (0, 2, 4)
 alternative_prophey_schedule = (1, 3, 5)
 
 
+# TODO: I suppose I could have thrown a normal date object in a dictionary or dataclass along with my new attributes...
 # Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
 class Date(datetime.date):
     bleeds_list: list[str]
