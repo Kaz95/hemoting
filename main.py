@@ -5,6 +5,7 @@ import csv
 # Used to randomize bleed location. Nothing else.
 bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
+# TODO: Magiks # Reeeeeeee
 # Tuple of days of the week as used by the datetime class. Mon, Wed, Fri. Used as a schedule representation.
 normal_prophey_schedule = (0, 2, 4)
 # Tuple of days of the week as referenced by the datetime class. Tue, Thur, Sat. Used as a schedule representation.
@@ -84,6 +85,7 @@ def get_date() -> Date:
     return date
 
 
+# TODO: Magiks # Reeeeeeee
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # Figured out by hand, consider how I could have done this using math.
@@ -123,6 +125,7 @@ def randomize_bleed_location() -> str:
     return bleed_location
 
 
+# TODO: Magiks # Reeeeeeee
 def randomize_bleed_duration() -> int:
     return random.randrange(1, 5)
 
@@ -163,6 +166,7 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
     return bepisode_list
 
 
+# TODO: Magiks # Reeeeeeee....but probably fine given the context
 # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
 def randomize_time_stamp(starting_hour: int, ending_hour: int) -> datetime.time:
     randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
@@ -170,6 +174,7 @@ def randomize_time_stamp(starting_hour: int, ending_hour: int) -> datetime.time:
     return datetime.time(hour=randomized_hour, minute=randomized_minute)
 
 
+# TODO: Magiks # Reeeeeeee
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
 # TODO: Could this be defined inside add_infusions_to_log()???
 def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, toggle: bool = False) -> int:
@@ -181,6 +186,7 @@ def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, to
     return doses_on_hand
 
 
+# TODO: Magiks # Reeeeeeee
 # Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
 # A new list will be created with Date objects that meet certain criteria.
@@ -298,6 +304,7 @@ def output_log_to_csv(log: list) -> None:
                 log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
 
 
+# TODO: Magiks # Reeeeeeee
 # Helper function to print out a CLI menu
 def print_menu_border() -> None:
     for i in range(54):
