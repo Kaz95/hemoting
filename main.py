@@ -54,6 +54,11 @@ class ScheduleHandler:
 # TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
 # Class to encapsulate the data pertaining to a given bleeding episode.
 class Bepisode:
+    start_date: Date
+    location: str
+    duration: int
+    dates_active: list[Date]
+
     def __init__(self, start_date, location, duration):
         self.start_date = start_date
         self.location = location
@@ -346,4 +351,4 @@ def main() -> None:
 # TODO: Times I've thought: "Damn,I should write some tests", but did not --> 22
 if __name__ == '__main__':
     main()
-    
+
