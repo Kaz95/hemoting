@@ -195,38 +195,28 @@ def add_infusions_to_log(blank_log: list) -> list:
                 infusion_log.append(date)
                 yesterday_index = blank_log.index(date) - 1
                 day_before_yesterday_index = blank_log.index(date) - 2
-                if yesterday_index and day_before_yesterday_index >= 0:
-                    try:
-                        if blank_log[yesterday_index].infused and blank_log[day_before_yesterday_index].infused:
-                            if date.weekday() == 6:
-                                scheduler.toggle()
-                            continue
-                    # TODO: Verify wtf is actually happening here.
-                    except ValueError:
-                        print('index was out of range when checking prev two days, but was handled')
-
+                if yesterday_index >= 0 and day_before_yesterday_index >= 0:
+                    if blank_log[yesterday_index].infused and blank_log[day_before_yesterday_index].infused:
+                        if date.weekday() == 6:
+                            scheduler.toggle()
+                        continue
                     if date.weekday() not in scheduler.current_schedule:
                         doses_on_hand = infuse(date, doses_on_hand, scheduler, toggle=True)
                     else:
                         doses_on_hand = infuse(date, doses_on_hand, scheduler)
-
                 else:
                     if date.weekday() not in scheduler.current_schedule:
                         doses_on_hand = infuse(date, doses_on_hand, scheduler, toggle=True)
                     else:
                         doses_on_hand = infuse(date, doses_on_hand, scheduler)
-
             elif date.weekday() in scheduler.current_schedule:
                 infusion_log.append(date)
                 doses_on_hand = infuse(date, doses_on_hand, scheduler)
-
             else:
                 if date.weekday() == 6:
                     scheduler.reset()
-
-        # TODO is this else case even needed?
         else:
-            pass
+            break
 
     return infusion_log
 
