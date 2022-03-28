@@ -1,15 +1,24 @@
 import datetime
 import random
 import csv
+from typing import Final
+
+# Some constants to help write days for Date class in a more readable for
+MONDAY: Final = 0
+TUESDAY: Final = 1
+WEDNESDAY: Final = 2
+THURSDAY: Final = 3
+FRIDAY: Final = 4
+SATURDAY: Final= 5
+SUNDAY: Final = 6
 
 # Used to randomize bleed location. Nothing else.
 bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
-# TODO: Magiks # Reeeeeeee
 # Tuple of days of the week as used by the datetime class. Mon, Wed, Fri. Used as a schedule representation.
-normal_prophey_schedule = (0, 2, 4)
+normal_prophey_schedule = (MONDAY, WEDNESDAY, FRIDAY)
 # Tuple of days of the week as referenced by the datetime class. Tue, Thur, Sat. Used as a schedule representation.
-alternative_prophey_schedule = (1, 3, 5)
+alternative_prophey_schedule = (TUESDAY, THURSDAY, SATURDAY)
 
 
 # TODO: I suppose I could have thrown a normal date object in a dictionary or dataclass along with my new attributes...
@@ -85,20 +94,19 @@ def get_date() -> Date:
     return date
 
 
-# TODO: Magiks # Reeeeeeee
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # Figured out by hand, consider how I could have done this using math.
 def get_max_days(starting_weekday: int) -> int:
     maximum_possible_days = 21
     # Mon or Wed
-    if starting_weekday in [0, 2]:
+    if starting_weekday in [MONDAY, WEDNESDAY]:
         maximum_possible_days += 2
     # Sun, Tue, or Fri
-    elif starting_weekday in [6, 1, 4]:
+    elif starting_weekday in [SUNDAY, TUESDAY, FRIDAY]:
         maximum_possible_days += 3
     # Sat or Thr
-    elif starting_weekday in [3, 5]:
+    elif starting_weekday in [THURSDAY, SATURDAY]:
         maximum_possible_days += 4
     else:
         raise Exception('Weekday was somehow out of range?')
