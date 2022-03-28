@@ -12,15 +12,15 @@ alternative_prophey_schedule = (1, 3, 5)
 
 
 # Extended datetime object. Always me to couple bleeds, infusions, and infusion timestamps to a given date.
-class Date(datetime.datetime):
+class Date(datetime.date):
 
-    def __new__(cls, year, month, day, hour, minute, second, microsecond, tzinfo, infusion=None):
-        return super().__new__(cls, year=year, month=month, day=day, hour=hour, minute=minute, second=second, microsecond=microsecond, tzinfo=tzinfo)
+    def __new__(cls, *arg, **kwargs):
+        return super().__new__(cls, *arg, **kwargs)
 
-    def __init__(self, year, month, day, hour, minute, second, microsecond, tzinfo, infused=False):
+    def __init__(self, *arg, **kwargs):
         super().__init__()
         self.bleeds_list = []   # Holds strings representing an active bleeding episode
-        self.infused = infused
+        self.infused = False
         self.time_stamp = None
 
 
@@ -65,7 +65,7 @@ def get_date() -> Date:
     year = int(input('Input Year XXXX: '))
     month = int(input('Input Month X(X): '))
     day = int(input('Input Day X(X): '))
-    date = Date(year, month, day, 0, 0, 0, 0, None)
+    date = Date(year, month, day)
     return date
 
 
@@ -334,7 +334,7 @@ def main() -> None:
 
 # TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 21
+# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 22
 if __name__ == '__main__':
     main()
     
