@@ -9,7 +9,7 @@ TUESDAY: Final = 1
 WEDNESDAY: Final = 2
 THURSDAY: Final = 3
 FRIDAY: Final = 4
-SATURDAY: Final= 5
+SATURDAY: Final = 5
 SUNDAY: Final = 6
 
 # Used to randomize bleed location. Nothing else.
@@ -83,8 +83,6 @@ class Bepisode:
             self.dates_active.append(projected_date)
 
 
-# TODO: Pretty sure if I have Date inherit from date, instead of datetime, I could avoid all the random ass defaults.
-# TODO: I could probably also set default values in class init or definition to achieve the same effect.
 # Gets user input and creates a Date object.
 def get_date() -> Date:
     year = int(input('Input Year XXXX: '))
@@ -96,7 +94,7 @@ def get_date() -> Date:
 
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
-# Figured out by hand, consider how I could have done this using math.
+# TODO: Figured out by hand, consider how I could have done this using math.
 def get_max_days(starting_weekday: int) -> int:
     maximum_possible_days = 21
     # Mon or Wed
