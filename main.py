@@ -21,7 +21,6 @@ normal_prophey_schedule = (MONDAY, WEDNESDAY, FRIDAY)
 alternative_prophey_schedule = (TUESDAY, THURSDAY, SATURDAY)
 
 
-# TODO: I suppose I could have thrown a normal date object in a dictionary or dataclass along with my new attributes...
 # Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
 class Date(datetime.date):
     bleeds_list: list[str]
@@ -130,7 +129,7 @@ def randomize_bleed_location() -> str:
     return bleed_location
 
 
-# TODO: Magiks # Reeeeeeee
+# TODO: Magic #
 def randomize_bleed_duration() -> int:
     return random.randrange(1, 5)
 
@@ -171,7 +170,7 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
     return bepisode_list
 
 
-# TODO: Magiks # Reeeeeeee....but probably fine given the context
+# TODO: Magic #....but probably fine given the context
 # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
 def randomize_time_stamp(starting_hour: int, ending_hour: int) -> datetime.time:
     randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
@@ -179,9 +178,9 @@ def randomize_time_stamp(starting_hour: int, ending_hour: int) -> datetime.time:
     return datetime.time(hour=randomized_hour, minute=randomized_minute)
 
 
-# TODO: Magiks # Reeeeeeee
+# TODO: Magic #
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
-# TODO: Could this be defined inside add_infusions_to_log()???
+# TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
 def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, toggle: bool = False) -> int:
     date.infused = True
     doses_on_hand -= 1
@@ -191,7 +190,7 @@ def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, to
     return doses_on_hand
 
 
-# TODO: Magiks # Reeeeeeee
+# TODO: Magic #
 # Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
 # A new list will be created with Date objects that meet certain criteria.
@@ -259,7 +258,6 @@ def get_all_inputs() -> tuple[Date, list]:
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
-# TODO: I need to break this down a bit. Inputs should be separate from log generation at the least.
 def generate_log() -> list:
     starting_date, manual_bepisodes = get_all_inputs()
     max_possible_days = get_max_days(starting_date.weekday())
@@ -292,8 +290,7 @@ def make_csv_title(log: list) -> str:
     return csv_title
 
 
-# TODO: I'm pretty sure I pass in a list of ONLY relevant dates already due to previous changes. Look into it.
-# Used to output a sifted log to csv
+# Used to output log to csv
 def output_log_to_csv(log: list) -> None:
     csv_title = make_csv_title(log)
     with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
@@ -309,7 +306,7 @@ def output_log_to_csv(log: list) -> None:
                 log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
 
 
-# TODO: Magiks # Reeeeeeee
+# TODO: Magic #
 # Helper function to print out a CLI menu
 def print_menu_border() -> None:
     for i in range(54):
@@ -349,9 +346,8 @@ def main() -> None:
             print('Not yet implemented.\n\n\n')
 
 
-# TODO: Add Type hints.....I think that's what they are called. Read up on it again.
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn,I should write some tests", but did not --> 26
+# TODO: Times I've thought: "Damn, I should write some tests.", but did not --> 30
 if __name__ == '__main__':
     main()
 
