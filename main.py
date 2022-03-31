@@ -32,7 +32,6 @@ class Date(datetime.date):
         return super().__new__(cls, *arg, **kwargs)
 
     def __init__(self, *arg, **kwargs):
-        super().__init__()
         self.bleeds_list = []   # Holds strings representing an active bleeding episode
         self.infused = False
         self.time_stamp = None
