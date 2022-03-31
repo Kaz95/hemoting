@@ -185,7 +185,7 @@ def randomize_time_stamp(starting_hour: int, ending_hour: int) -> datetime.time:
 def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, toggle: bool = False) -> int:
     date.infused = True
     doses_on_hand -= 1
-    date.timestamp = randomize_time_stamp(7, 10)
+    date.time_stamp = randomize_time_stamp(7, 10)
     if toggle:
         schedule_handler.toggle()
     return doses_on_hand
