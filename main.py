@@ -2,8 +2,9 @@ import datetime
 import random
 import csv
 from typing import Final
+from dataclasses import dataclass, field
 
-# Some constants to help write days for Date class in a more readable for
+# Some constants to help write days for Date class in a more readable form
 MONDAY: Final = 0
 TUESDAY: Final = 1
 WEDNESDAY: Final = 2
@@ -68,27 +69,35 @@ class ScheduleHandler:
         self.current_schedule = self.normal_schedule
 
 
-# TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
-# TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
-# Class to encapsulate the data pertaining to a given bleeding episode.
+@dataclass
 class Bepisode:
     start_date: Date
     location: str
     duration: int
-    dates_active: list[Date]
+    dates_active: list[Date] = field(default_factory=list)
 
-    def __init__(self, start_date, location, duration):
-        self.start_date = start_date
-        self.location = location
-        self.duration = duration
-        self.dates_active = []
 
-    # Method that projects days bled, based on duration and start date.
-    def project_dates(self) -> None:
-        for _ in range(self.duration):
-            projected_date = self.start_date + datetime.timedelta(_)
-            self.dates_active.append(projected_date)
 
+# TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
+# TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
+# Class to encapsulate the data pertaining to a given bleeding episode.
+# class Bepisode:
+#     start_date: Date
+#     location: str
+#     duration: int
+#     dates_active: list[Date]
+#
+#     def __init__(self, start_date, location, duration):
+#         self.start_date = start_date
+#         self.location = location
+#         self.duration = duration
+#         self.dates_active = []
+#
+#     # Method that projects days bled, based on duration and start date.
+#     def project_dates(self) -> None:
+#         for _ in range(self.duration):
+#             projected_date = self.start_date + datetime.timedelta(_)
+#             self.dates_active.append(projected_date)
 
 # Gets user input and creates a Date object.
 def get_date() -> Date:
@@ -119,7 +128,7 @@ def get_max_days(starting_weekday: int) -> int:
 
 
 # Creates and returns a list of Date objects within a range based on input.
-def make_blank_log(starting_date: Date, maximum_possible_days: int) -> list:
+def generate_dates(starting_date: Date, maximum_possible_days: int) -> list:
     blank_log = [starting_date + datetime.timedelta(_) for _ in range(maximum_possible_days)]
     return blank_log
 
@@ -174,12 +183,10 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 
     for bepisode in bepisode_list:
         print(f'{bepisode.duration} - {bepisode.location}')     # Used to display bleeds that were active. Remove later
-        bepisode.project_dates()
+        # bepisode.project_dates()
+        bepisode.dates_active = generate_dates(bepisode.start_date, bepisode.duration)
 
     return bepisode_list
-
-
-
 
 
 # TODO: Magic #
@@ -267,7 +274,7 @@ def generate_log() -> list:
     max_possible_days = get_max_days(starting_date.weekday())
 
     bepisode_list = fill_bepisode_list(3, starting_date, max_possible_days, manual_bepisodes)
-    blank_log = make_blank_log(starting_date, max_possible_days)
+    blank_log = generate_dates(starting_date, max_possible_days)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
     full_log = add_infusions_to_log(log_with_bleeds)
@@ -351,7 +358,7 @@ def main() -> None:
 
 
 # TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn, I should write some tests.", but did not --> 30
+# TODO: Times I've thought: "Damn, I should write some tests.", but did not --> 31
 if __name__ == '__main__':
     main()
 
