@@ -76,6 +76,9 @@ class Bepisode:
     duration: int
     dates_active: list[Date] = field(default_factory=list)
 
+    def project_dates(self):
+        self.dates_active = generate_dates(self.start_date, self.duration)
+
 
 
 # TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
@@ -183,8 +186,8 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 
     for bepisode in bepisode_list:
         print(f'{bepisode.duration} - {bepisode.location}')     # Used to display bleeds that were active. Remove later
-        # bepisode.project_dates()
-        bepisode.dates_active = generate_dates(bepisode.start_date, bepisode.duration)
+        bepisode.project_dates()
+        # bepisode.dates_active = generate_dates(bepisode.start_date, bepisode.duration)
 
     return bepisode_list
 
