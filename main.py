@@ -32,7 +32,7 @@ class Date(datetime.datetime):
         return super().__new__(cls, *arg, **kwargs)
 
     def __init__(self, *arg, **kwargs):
-        self.bleeds_list = []   # Holds strings representing an active bleeding episode
+        self.bleeds_list = []  # Holds strings representing an active bleeding episode
         self.infused = False
         self.time_stamp = None
 
@@ -80,7 +80,6 @@ class Bepisode:
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
-
 # TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
 # TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
 # Class to encapsulate the data pertaining to a given bleeding episode.
@@ -101,6 +100,7 @@ class Bepisode:
 #         for _ in range(self.duration):
 #             projected_date = self.start_date + datetime.timedelta(_)
 #             self.dates_active.append(projected_date)
+
 
 # Gets user input and creates a Date object.
 def get_date() -> Date:
@@ -179,13 +179,14 @@ def couple_bleeds_to_dates(bepisodes_list: list, log: list) -> list:
 
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
 # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
-def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days: int, bepisode_list: list) -> list:
+def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days: int,
+                       bepisode_list: list) -> list:
     while len(bepisode_list) < number_of_bleeds_set:
         bepisode = randomize_bleed_episode(starting_date, maximum_possible_days)
         bepisode_list.append(bepisode)
 
     for bepisode in bepisode_list:
-        print(f'{bepisode.duration} - {bepisode.location}')     # Used to display bleeds that were active. Remove later
+        print(f'{bepisode.duration} - {bepisode.location}')  # Used to display bleeds that were active. Remove later
         bepisode.project_dates()
         # bepisode.dates_active = generate_dates(bepisode.start_date, bepisode.duration)
 
@@ -364,4 +365,3 @@ def main() -> None:
 # TODO: Times I've thought: "Damn, I should write some tests.", but did not --> 31
 if __name__ == '__main__':
     main()
-
