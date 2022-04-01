@@ -22,7 +22,7 @@ alternative_prophey_schedule = (TUESDAY, THURSDAY, SATURDAY)
 
 
 # Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
-class Date(datetime.date):
+class Date(datetime.datetime):
     bleeds_list: list[str]
     infused: bool
     time_stamp: datetime.time | None
@@ -34,6 +34,15 @@ class Date(datetime.date):
         self.bleeds_list = []   # Holds strings representing an active bleeding episode
         self.infused = False
         self.time_stamp = None
+
+    def infuse(self) -> None:
+        self.infused = True
+
+    # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
+    def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
+        randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
+        randomized_minute = random.randrange(1, 60)
+        self.time_stamp = datetime.time(hour=randomized_hour, minute=randomized_minute)
 
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
@@ -170,21 +179,16 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
     return bepisode_list
 
 
-# TODO: Magic #....but probably fine given the context
-# Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
-def randomize_time_stamp(starting_hour: int, ending_hour: int) -> datetime.time:
-    randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
-    randomized_minute = random.randrange(1, 60)
-    return datetime.time(hour=randomized_hour, minute=randomized_minute)
+
 
 
 # TODO: Magic #
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
 # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
 def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, toggle: bool = False) -> int:
-    date.infused = True
+    date.infuse()
     doses_on_hand -= 1
-    date.time_stamp = randomize_time_stamp(7, 10)
+    date.randomize_time_stamp(7, 10)
     if toggle:
         schedule_handler.toggle()
     return doses_on_hand
