@@ -73,6 +73,8 @@ class ScheduleHandler:
         self.current_schedule = self.normal_schedule
 
 
+# TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
+# TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
 @dataclass
 class Bepisode:
     start_date: Date
@@ -83,28 +85,6 @@ class Bepisode:
     # TODO: Test
     def project_dates(self):
         self.dates_active = generate_dates(self.start_date, self.duration)
-
-
-# TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
-# TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
-# Class to encapsulate the data pertaining to a given bleeding episode.
-# class Bepisode:
-#     start_date: Date
-#     location: str
-#     duration: int
-#     dates_active: list[Date]
-#
-#     def __init__(self, start_date, location, duration):
-#         self.start_date = start_date
-#         self.location = location
-#         self.duration = duration
-#         self.dates_active = []
-#
-#     # Method that projects days bled, based on duration and start date.
-#     def project_dates(self) -> None:
-#         for _ in range(self.duration):
-#             projected_date = self.start_date + datetime.timedelta(_)
-#             self.dates_active.append(projected_date)
 
 
 # TODO: Test
