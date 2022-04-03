@@ -1,4 +1,6 @@
 import datetime
+from datetime import date
+import functools
 import random
 import csv
 from typing import Final
@@ -87,14 +89,36 @@ class Bepisode:
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
-# TODO: Test
-# Gets user input and creates a Date object.
-def get_date() -> Date:
-    year = int(input('Input Year XXXX: '))
-    month = int(input('Input Month X(X): '))
-    day = int(input('Input Day X(X): '))
-    date = Date(year, month, day)
-    return date
+def validate_date_inputs(minimum, maximum, some_input):
+    if some_input.isdecimal():
+        some_input = int(some_input)
+        if minimum < some_input < maximum:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def get_valid_date_input(minimum, maximum, unit):
+    while True:
+        answer = input(f'Enter {unit}: ')
+        if validate_date_inputs(minimum, maximum, answer):
+            return int(answer)
+        else:
+            print(f'{unit} out of range! Enter an integer in range {minimum} - {maximum}')
+
+
+get_valid_day_input = functools.partial(get_valid_date_input, minimum=date.min.day, maximum=date.max.day, unit='Day')
+get_valid_month_input = functools.partial(get_valid_date_input, minimum=date.min.month, maximum=date.max.month, unit='Month')
+get_valid_year_input = functools.partial(get_valid_date_input, minimum=date.min.year, maximum=date.max.year, unit='Year')
+
+
+def make_date():
+    year = get_valid_year_input()
+    month = get_valid_month_input()
+    day = get_valid_day_input()
+    return Date(year, month, day)
 
 
 # TODO: Test
@@ -249,7 +273,7 @@ def get_manual_bleeds() -> list:
     while True:
         answer = input('Add Manual Bepisode? ')
         if answer.capitalize() == 'Y':
-            starting_date = get_date()
+            starting_date = make_date()
             location = input('Enter Bleed location ')
             duration = int(input('Enter Numerical Duration '))
             bepisode = Bepisode(starting_date, location, duration)
@@ -262,7 +286,7 @@ def get_manual_bleeds() -> list:
 # TODO: Test
 # TODO: Add real comment/decide if I actually want to use this.
 def get_all_inputs() -> tuple[Date, list]:
-    starting_date = get_date()
+    starting_date = make_date()
     manual_bepisodes = get_manual_bleeds()
     return starting_date, manual_bepisodes
 
