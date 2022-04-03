@@ -38,11 +38,9 @@ class Date(datetime.datetime):
         self.infused = False
         self.time_stamp = None
 
-    # TODO: Test
     def infuse(self) -> None:
         self.infused = True
 
-    # TODO: Test
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
         randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
@@ -63,14 +61,12 @@ class ScheduleHandler:
         self.alternate_schedule = alternate_schedule
         self.current_schedule = normal_schedule
 
-    # TODO: Test
     def toggle(self) -> None:
         if self.current_schedule == self.normal_schedule:
             self.current_schedule = self.alternate_schedule
         else:
             self.current_schedule = self.normal_schedule
 
-    # TODO: Test
     def reset(self) -> None:
         self.current_schedule = self.normal_schedule
 
@@ -84,12 +80,10 @@ class Bepisode:
     duration: int
     dates_active: list[Date] = field(default_factory=list)
 
-    # TODO: Test
     def project_dates(self):
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
-# TODO: Test
 def validate_date_inputs(minimum, maximum, some_input):
     if some_input.isdecimal():
         some_input = int(some_input)
@@ -120,7 +114,6 @@ get_valid_month_input = functools.partial(get_valid_date_input, minimum=date.min
 get_valid_year_input = functools.partial(get_valid_date_input, minimum=date.min.year, maximum=date.max.year, unit='Year')
 
 
-# TODO: Test
 def make_date():
     year = get_valid_year_input()
     month = get_valid_month_input()
@@ -128,7 +121,6 @@ def make_date():
     return Date(year, month, day)
 
 
-# TODO: Test
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # TODO: Figured out by hand, consider how I could have done this using math.
@@ -148,14 +140,12 @@ def get_max_days(starting_weekday: int) -> int:
     return maximum_possible_days
 
 
-# TODO: Test
 # Creates and returns a list of Date objects within a range based on input.
 def generate_dates(starting_date: Date, maximum_possible_days: int) -> list:
     blank_log = [starting_date + datetime.timedelta(_) for _ in range(maximum_possible_days)]
     return blank_log
 
 
-# TODO: Test
 # Randomizes a Date object within a given range of dates.
 def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) -> Date:
     days_added = random.randrange(1, maximum_days_added)
@@ -163,7 +153,6 @@ def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) 
     return bleed_start_date
 
 
-# TODO: Test
 # Chooses and returns a random string from bleed locations list
 def randomize_bleed_location() -> str:
     bleed_location_index = random.randrange(len(bleed_locations))
@@ -171,13 +160,11 @@ def randomize_bleed_location() -> str:
     return bleed_location
 
 
-# TODO: Test
 # TODO: Magic #
 def randomize_bleed_duration() -> int:
     return random.randrange(1, 5)
 
 
-# TODO: Test
 def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int) -> Bepisode:
     bleed_start_date = randomize_bleed_episode_start(starting_date, maximum_possible_days)
     location = randomize_bleed_location()
@@ -185,7 +172,6 @@ def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int) -> 
     return Bepisode(bleed_start_date, location, duration)
 
 
-# TODO: Test
 # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
 # If one is found, the Date object will have its bleed list updated with a string.
 # The string represents the location of the aforementioned bleed.
@@ -201,7 +187,6 @@ def couple_bleeds_to_dates(bepisodes_list: list, log: list) -> list:
     return log
 
 
-# TODO: Test
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
 # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
 def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days: int,
@@ -218,7 +203,6 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
     return bepisode_list
 
 
-# TODO: Test
 # TODO: Magic #
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
 # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
@@ -231,7 +215,6 @@ def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, to
     return doses_on_hand
 
 
-# TODO: Test
 # TODO: Magic #
 # Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
@@ -273,7 +256,6 @@ def add_infusions_to_log(blank_log: list) -> list:
     return infusion_log
 
 
-# TODO: Test
 # Resulting list will be fed into randomize_all_bleed_episodes function at some point. Keep them compatible.
 def get_manual_bleeds() -> list:
     manual_bepisodes = []
@@ -290,7 +272,6 @@ def get_manual_bleeds() -> list:
     return manual_bepisodes
 
 
-# TODO: Test
 # TODO: Add real comment/decide if I actually want to use this.
 def get_all_inputs() -> tuple[Date, list]:
     starting_date = make_date()
@@ -298,7 +279,6 @@ def get_all_inputs() -> tuple[Date, list]:
     return starting_date, manual_bepisodes
 
 
-# TODO: Test
 # Creates a blank log based on user inputted start date/last shipment.
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
@@ -325,7 +305,6 @@ def print_log(log: list) -> None:
             print(f'{date} - {date.infused} - Prophey')
 
 
-# TODO: Test
 # Creates a string title for csv files based on first and last item in a list of Date objects.
 def make_csv_title(log: list) -> str:
     starting_date = log[0]
@@ -336,7 +315,6 @@ def make_csv_title(log: list) -> str:
     return csv_title
 
 
-# TODO: Test
 # Used to output log to csv
 def output_log_to_csv(log: list) -> None:
     csv_title = make_csv_title(log)
@@ -378,7 +356,6 @@ def print_menu_options() -> None:
     print()
 
 
-# TODO: Test
 def main() -> None:
     while True:
         print_menu_header()
