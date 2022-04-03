@@ -1,5 +1,4 @@
 import datetime
-from datetime import date
 import functools
 import random
 import csv
@@ -42,6 +41,7 @@ class Date(datetime.datetime):
     def infuse(self) -> None:
         self.infused = True
 
+    # TODO: I need to enforce this comment. Numbers outside range should throw an error.
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
         randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
@@ -110,9 +110,9 @@ def get_valid_date_input(minimum, maximum, unit):
 
 # TODO: Test..I guess I can verify the func and params via Partial attributes...That's actually super fucking useful.
 # TODO: 100% better option then simple closure for testing purposes alone. Not to mention saving a crap ton of boiler plate.
-get_valid_day_input = functools.partial(get_valid_date_input, minimum=date.min.day, maximum=date.max.day, unit='Day')
-get_valid_month_input = functools.partial(get_valid_date_input, minimum=date.min.month, maximum=date.max.month, unit='Month')
-get_valid_year_input = functools.partial(get_valid_date_input, minimum=date.min.year, maximum=date.max.year, unit='Year')
+get_valid_day_input = functools.partial(get_valid_date_input, minimum=datetime.date.min.day, maximum=datetime.date.max.day, unit='Day')
+get_valid_month_input = functools.partial(get_valid_date_input, minimum=datetime.date.min.month, maximum=datetime.date.max.month, unit='Month')
+get_valid_year_input = functools.partial(get_valid_date_input, minimum=datetime.date.min.year, maximum=datetime.date.max.year, unit='Year')
 
 
 def make_date():
@@ -372,7 +372,9 @@ def main() -> None:
             print('Not yet implemented.\n\n\n')
 
 
-# TODO: Need Testing, program is growing. Should have done from start. Look into test driven development again.
-# TODO: Times I've thought: "Damn, I should write some tests.", but did not --> 31
+# TODO: Consider adding custom types that more closely adhere to the public contract.
+#  A schedule is a tuple of three integers, but I'm not current enforcing the range of those integers.
+# TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
+# TODO:
 if __name__ == '__main__':
     main()

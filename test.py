@@ -3,10 +3,10 @@ import main
 
 
 class TestDateMethods(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.date = main.Date(2022, 2, 2)
 
-    def tearDown(self) -> None:
+    def tearDown(self):
         del self.date
 
     def test_infuse(self):
@@ -15,6 +15,7 @@ class TestDateMethods(unittest.TestCase):
 
     def test_randomize_time_stamp(self):
         self.date.randomize_time_stamp(7, 10)
+        self.assertIsNotNone(self.date.time_stamp)
 
 
 class TestScheduleHandlerMethods(unittest.TestCase):
