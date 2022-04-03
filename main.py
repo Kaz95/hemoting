@@ -33,6 +33,7 @@ class Date(datetime.datetime):
     def __new__(cls, *arg, **kwargs):
         return super().__new__(cls, *arg, **kwargs)
 
+    # TODO: this cannot take a dynamic amount of args, so I should be explicit.
     def __init__(self, *arg, **kwargs):
         self.bleeds_list = []  # Holds strings representing an active bleeding episode
         self.infused = False

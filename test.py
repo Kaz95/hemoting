@@ -1,31 +1,43 @@
 import unittest
+import main
 
 
-class TestClassMethods(unittest.TestCase):
+class TestDateMethods(unittest.TestCase):
+    def setUp(self) -> None:
+        self.date = main.Date(2022, 2, 2)
+
+    def tearDown(self) -> None:
+        del self.date
+
     def test_infuse(self):
-        pass
+        self.date.infuse()
+        self.assertTrue(self.date.infused)
 
     def test_randomize_time_stamp(self):
-        pass
+        self.date.randomize_time_stamp(7, 10)
 
+
+class TestScheduleHandlerMethods(unittest.TestCase):
     def test_toggle(self):
         pass
 
     def test_reset(self):
         pass
 
+
+class TestBepisodeMethods(unittest.TestCase):
     def test_project_dates(self):
         pass
 
 
 class TestPartialFunctionCreation(unittest.TestCase):
-    def test_get_valid_day_input_creatioin(self):
+    def test_get_valid_day_input_creation(self):
         pass
 
-    def test_get_valid_month_input_creatioin(self):
+    def test_get_valid_month_input_creation(self):
         pass
 
-    def test_get_valid_year_input_creatioin(self):
+    def test_get_valid_year_input_creation(self):
         pass
 
 
