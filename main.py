@@ -38,9 +38,6 @@ class Date(datetime.datetime):
         self.infused = False
         self.time_stamp = None
 
-    def infuse(self) -> None:
-        self.infused = True
-
     # TODO: I need to enforce this comment. Numbers outside range should throw an error.
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
@@ -208,7 +205,7 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
 # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
 def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, toggle: bool = False) -> int:
-    date.infuse()
+    date.infused = True
     doses_on_hand -= 1
     date.randomize_time_stamp(7, 10)
     if toggle:
