@@ -2,23 +2,28 @@ import unittest
 import main
 
 
-class TestDateMethods(unittest.TestCase):
+class TestDate(unittest.TestCase):
     def setUp(self):
         self.date = main.Date(2022, 2, 2)
 
     def tearDown(self):
         del self.date
 
-    def test_infuse(self):
-        self.date.infuse()
-        self.assertTrue(self.date.infused)
-
     def test_randomize_time_stamp(self):
         self.date.randomize_time_stamp(7, 10)
         self.assertIsNotNone(self.date.time_stamp)
 
 
-class TestScheduleHandlerMethods(unittest.TestCase):
+class TestScheduleHandler(unittest.TestCase):
+    def setUp(self):
+        self.handler = main.ScheduleHandler(main.normal_prophey_schedule, main.alternative_prophey_schedule)
+
+    def tearDown(self):
+        del self.handler
+
+    def test_default_current_schedule(self):
+        pass
+
     def test_toggle(self):
         pass
 
@@ -26,7 +31,7 @@ class TestScheduleHandlerMethods(unittest.TestCase):
         pass
 
 
-class TestBepisodeMethods(unittest.TestCase):
+class TestBepisode(unittest.TestCase):
     def test_project_dates(self):
         pass
 
