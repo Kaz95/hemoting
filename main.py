@@ -89,6 +89,7 @@ class Bepisode:
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
+# TODO: Test
 def validate_date_inputs(minimum, maximum, some_input):
     if some_input.isdecimal():
         some_input = int(some_input)
@@ -100,6 +101,9 @@ def validate_date_inputs(minimum, maximum, some_input):
         return False
 
 
+# TODO: Don't think i can....Test...easily...
+# TODO: OK what if I mock input method w/ side effects? I can verify the length of the fake input list to be sure the -
+# TODO: func did not return on given inputs, but did continue accepting them. I could even verify stdout stream I spose.
 def get_valid_date_input(minimum, maximum, unit):
     while True:
         answer = input(f'Enter {unit}: ')
@@ -109,11 +113,14 @@ def get_valid_date_input(minimum, maximum, unit):
             print(f'{unit} out of range! Enter an integer in range {minimum} - {maximum}')
 
 
+# TODO: Test..I guess I can verify the func and params via Partial attributes...That's actually super fucking useful.
+# TODO: 100% better option then simple closure for testing purposes alone. Not to mention saving a crap ton of boiler plate.
 get_valid_day_input = functools.partial(get_valid_date_input, minimum=date.min.day, maximum=date.max.day, unit='Day')
 get_valid_month_input = functools.partial(get_valid_date_input, minimum=date.min.month, maximum=date.max.month, unit='Month')
 get_valid_year_input = functools.partial(get_valid_date_input, minimum=date.min.year, maximum=date.max.year, unit='Year')
 
 
+# TODO: Test
 def make_date():
     year = get_valid_year_input()
     month = get_valid_month_input()
