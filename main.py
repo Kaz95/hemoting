@@ -18,6 +18,7 @@ SUNDAY: Final = 6
 # Used to randomize bleed location. Nothing else.
 bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
+
 # Tuple of days of the week as used by the datetime class. Mon, Wed, Fri. Used as a schedule representation.
 # normal_prophey_schedule = (MONDAY, WEDNESDAY, FRIDAY)
 # Tuple of days of the week as referenced by the datetime class. Tue, Thur, Sat. Used as a schedule representation.
@@ -107,9 +108,12 @@ def _get_valid_date_input(minimum, maximum, unit):
 
 # TODO: Test..I guess I can verify the func and params via Partial attributes...That's actually super fucking useful.
 # TODO: 100% better option then simple closure for testing purposes alone. Not to mention saving a crap ton of boiler plate.
-get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day, maximum=datetime.date.max.day, unit='Day')
-get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month, maximum=datetime.date.max.month, unit='Month')
-get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.year, maximum=datetime.date.max.year, unit='Year')
+get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day,
+                                        maximum=datetime.date.max.day, unit='Day')
+get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month,
+                                          maximum=datetime.date.max.month, unit='Month')
+get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.year,
+                                         maximum=datetime.date.max.year, unit='Year')
 
 
 def make_date():
@@ -287,7 +291,8 @@ def generate_log(settings_handler) -> list:
     starting_date, manual_bepisodes = get_all_inputs()
     max_possible_days = get_max_days(starting_date.weekday())
 
-    bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days, manual_bepisodes)
+    bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days,
+                                       manual_bepisodes)
     blank_log = generate_dates(starting_date, max_possible_days)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
@@ -406,8 +411,7 @@ def main() -> None:
 
 
 # TODO: Consider adding custom types that more closely adhere to the public contract.
-#  A schedule is a tuple of three integers, but I'm not current enforcing the range of those integers.
+#  A schedule is a tuple of three integers, but I'm not currently enforcing the range of those integers.
 # TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
-# TODO:
 if __name__ == '__main__':
     main()
