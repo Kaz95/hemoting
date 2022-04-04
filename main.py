@@ -19,10 +19,9 @@ SUNDAY: Final = 6
 bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
 # Tuple of days of the week as used by the datetime class. Mon, Wed, Fri. Used as a schedule representation.
-normal_prophey_schedule = (MONDAY, WEDNESDAY, FRIDAY)
+# normal_prophey_schedule = (MONDAY, WEDNESDAY, FRIDAY)
 # Tuple of days of the week as referenced by the datetime class. Tue, Thur, Sat. Used as a schedule representation.
-alternative_prophey_schedule = (TUESDAY, THURSDAY, SATURDAY)
-
+# alternative_prophey_schedule = (TUESDAY, THURSDAY, SATURDAY)
 
 # Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
 class Date(datetime.date):
@@ -210,9 +209,10 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 def add_infusions_to_log(blank_log: list, settings_handler: settings.SettingsHandler) -> list:
     doses_on_hand = 12
     infusion_log = []
+    normal_prophey_schedule = settings_handler.schedules['normal']
+    alternative_prophey_schedule = settings_handler.schedules['alternate']
     scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
 
-    # TODO: Magic #
     # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
     # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
     def infuse(toggle: bool = False) -> int:
@@ -366,6 +366,9 @@ def main() -> None:
             log = generate_log(setting_handler)
             print_log(log)
             output_log_to_csv(log)
+        if selection == '3':
+            # TODO: Implement....this thingo....later.
+            print('Coming Soon™!')
         elif selection == '4':
             break
         else:
