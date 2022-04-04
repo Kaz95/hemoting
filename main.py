@@ -4,6 +4,7 @@ import random
 import csv
 from typing import Final
 from dataclasses import dataclass, field
+import setup
 
 # Some constants to help write days for Date class in a more readable form
 MONDAY: Final = 0
@@ -204,10 +205,10 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 # TODO: Magic #
 # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
 # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
-def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, toggle: bool = False) -> int:
+def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, settings, toggle: bool = False) -> int:
     date.infused = True
     doses_on_hand -= 1
-    date.randomize_time_stamp(7, 10)
+    date.randomize_time_stamp(settings.time_stamp_range['min'], settings.time_stamp_range['max'])
     if toggle:
         schedule_handler.toggle()
     return doses_on_hand
@@ -218,7 +219,7 @@ def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, to
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
 # A new list will be created with Date objects that meet certain criteria.
 # Criterion includes: Was infused, had corresponding Bepisode, or both.
-def add_infusions_to_log(blank_log: list) -> list:
+def add_infusions_to_log(blank_log: list, settings: setup.Settings) -> list:
     doses_on_hand = 12
     infusion_log = []
     scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
@@ -234,17 +235,17 @@ def add_infusions_to_log(blank_log: list) -> list:
                             scheduler.toggle()
                         continue
                     if date.weekday() not in scheduler.current_schedule:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler, toggle=True)
+                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings, toggle=True)
                     else:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler)
+                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings)
                 else:
                     if date.weekday() not in scheduler.current_schedule:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler, toggle=True)
+                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings, toggle=True)
                     else:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler)
+                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings)
             elif date.weekday() in scheduler.current_schedule:
                 infusion_log.append(date)
-                doses_on_hand = infuse(date, doses_on_hand, scheduler)
+                doses_on_hand = infuse(date, doses_on_hand, scheduler, settings)
             else:
                 if date.weekday() == 6:
                     scheduler.reset()
@@ -281,7 +282,7 @@ def get_all_inputs() -> tuple[Date, list]:
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
-def generate_log() -> list:
+def generate_log(settings) -> list:
     starting_date, manual_bepisodes = get_all_inputs()
     max_possible_days = get_max_days(starting_date.weekday())
 
@@ -289,7 +290,7 @@ def generate_log() -> list:
     blank_log = generate_dates(starting_date, max_possible_days)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
-    full_log = add_infusions_to_log(log_with_bleeds)
+    full_log = add_infusions_to_log(log_with_bleeds, settings)
 
     return full_log
 
@@ -355,12 +356,13 @@ def print_menu_options() -> None:
 
 
 def main() -> None:
+    settings = setup.initialize_settings()
     while True:
         print_menu_header()
         print_menu_options()
         selection = input('What do?: ')
         if selection == '1':
-            log = generate_log()
+            log = generate_log(settings)
             print_log(log)
             output_log_to_csv(log)
         elif selection == '4':
