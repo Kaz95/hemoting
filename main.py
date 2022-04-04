@@ -367,10 +367,38 @@ def main() -> None:
             print_log(log)
             output_log_to_csv(log)
         elif selection == '3':
-            print('Only number of bleeds is implemented. So lets do that!')
-            new_setting = int(input('Enter new number of bleeds: '))
-            settings.update_number_of_bleeds(setting_handler, new_setting)
-            settings.save_settings(setting_handler)
+            print()
+            print('1.) Update # of Bleeds.')
+            print('2.) Update Time Stamp Range')
+            print('3.) Update Schedules')
+            print('4.) <--')
+            print_menu_border()
+            print()
+            selection = input('What do?: ')
+            if selection == '4':
+                continue
+            elif selection == '1':
+                new_setting = int(input('Enter new number of bleeds: '))
+                setting_handler.number_of_bleeds = new_setting
+                settings.save_settings(setting_handler)
+                print(f'# of Bleeds updated to: {setting_handler.number_of_bleeds}!')
+                continue
+            elif selection == '2':
+                lower = int(input('Enter lower end of timestamp range: '))
+                upper = int(input('Enter upper end of timestamp range: '))
+                setting_handler.time_stamp_range['min'] = lower
+                setting_handler.time_stamp_range['max'] = upper
+                settings.save_settings(setting_handler)
+                print(f'Time Stamp range updated to: {setting_handler.time_stamp_range}!')
+            elif selection == '3':
+                normal_sched = input('Enter new normal schedule as tuple: ')
+                alt_sched = input('Enter new alternate schedule as tuple: ')
+                normal_sched = [int(x) for x in normal_sched if x.isdecimal()]
+                alt_sched = [int(x) for x in alt_sched if x.isdecimal()]
+                setting_handler.schedules['normal'] = normal_sched
+                setting_handler.schedules['alternate'] = alt_sched
+                settings.save_settings(setting_handler)
+                print(f'Schedules updated to: {setting_handler.schedules}!')
         elif selection == '4':
             break
         else:
