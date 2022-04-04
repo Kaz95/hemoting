@@ -17,11 +17,7 @@ alternate_prophey_schedule = (1, 3, 5)
 
 settings_schema = {'number_of_bleeds': 3,
                    'time_stamp_range': {'min': 7, 'max': 10},
-                   'schedules':
-                       {'normal': normal_prophey_schedule,
-                        'alternate': alternate_prophey_schedule,
-                        'current': normal_prophey_schedule
-                        }
+                   'schedules': {'normal': normal_prophey_schedule, 'alternate': alternate_prophey_schedule}
                    }
 
 
@@ -66,12 +62,3 @@ def initialize_settings():
 
     settings_obj = make_settings_object(settings_dict)
     return settings_obj
-
-
-def _update_setting(setting_handler, updated_value, setting):
-    setting_handler.__dict__[setting] = updated_value
-
-
-update_number_of_bleeds = partial(_update_setting, setting='number_of_bleeds')
-update_schedules = partial(_update_setting, setting='schedules')
-update_time_stamp_range = partial(_update_setting, setting='time_stamp_range')
