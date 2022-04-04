@@ -96,7 +96,7 @@ def validate_date_inputs(minimum, maximum, some_input):
 # TODO: Don't think i can....Test...easily...
 # TODO: OK what if I mock input method w/ side effects? I can verify the length of the fake input list to be sure the -
 # TODO: func did not return on given inputs, but did continue accepting them. I could even verify stdout stream I spose.
-def get_valid_date_input(minimum, maximum, unit):
+def _get_valid_date_input(minimum, maximum, unit):
     while True:
         answer = input(f'Enter {unit}: ')
         if validate_date_inputs(minimum, maximum, answer):
@@ -107,9 +107,9 @@ def get_valid_date_input(minimum, maximum, unit):
 
 # TODO: Test..I guess I can verify the func and params via Partial attributes...That's actually super fucking useful.
 # TODO: 100% better option then simple closure for testing purposes alone. Not to mention saving a crap ton of boiler plate.
-get_valid_day_input = functools.partial(get_valid_date_input, minimum=datetime.date.min.day, maximum=datetime.date.max.day, unit='Day')
-get_valid_month_input = functools.partial(get_valid_date_input, minimum=datetime.date.min.month, maximum=datetime.date.max.month, unit='Month')
-get_valid_year_input = functools.partial(get_valid_date_input, minimum=datetime.date.min.year, maximum=datetime.date.max.year, unit='Year')
+get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day, maximum=datetime.date.max.day, unit='Day')
+get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month, maximum=datetime.date.max.month, unit='Month')
+get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.year, maximum=datetime.date.max.year, unit='Year')
 
 
 def make_date():
@@ -366,9 +366,11 @@ def main() -> None:
             log = generate_log(setting_handler)
             print_log(log)
             output_log_to_csv(log)
-        if selection == '3':
-            # TODO: Implement....this thingo....later.
-            print('Coming Soon™!')
+        elif selection == '3':
+            print('Only number of bleeds is implemented. So lets do that!')
+            new_setting = int(input('Enter new number of bleeds: '))
+            settings.update_number_of_bleeds(setting_handler, new_setting)
+            settings.save_settings(setting_handler)
         elif selection == '4':
             break
         else:
