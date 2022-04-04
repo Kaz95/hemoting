@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass
+from functools import partial
 
 # TODO: Remember JSON doesn't know or care w/e a tuple is. That's on me.
 
@@ -67,3 +68,10 @@ def initialize_settings():
     return settings_obj
 
 
+def _update_setting(setting_handler, updated_value, setting):
+    setting_handler.__dict__[setting] = updated_value
+
+
+update_number_of_bleeds = partial(_update_setting, setting='number_of_bleeds')
+update_schedules = partial(_update_setting, setting='schedules')
+update_time_stamp_range = partial(_update_setting, setting='time_stamp_range')
