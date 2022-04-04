@@ -203,18 +203,6 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 
 
 # TODO: Magic #
-# Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
-# TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
-def infuse(date: Date, doses_on_hand: int, schedule_handler: ScheduleHandler, settings, toggle: bool = False) -> int:
-    date.infused = True
-    doses_on_hand -= 1
-    date.randomize_time_stamp(settings.time_stamp_range['min'], settings.time_stamp_range['max'])
-    if toggle:
-        schedule_handler.toggle()
-    return doses_on_hand
-
-
-# TODO: Magic #
 # Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
 # A new list will be created with Date objects that meet certain criteria.
@@ -223,6 +211,19 @@ def add_infusions_to_log(blank_log: list, settings: setup.Settings) -> list:
     doses_on_hand = 12
     infusion_log = []
     scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
+
+    # TODO: Magic #
+    # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
+    # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
+    def infuse(toggle: bool = False) -> int:
+        nonlocal doses_on_hand
+        date.infused = True
+        doses_on_hand -= 1
+        date.randomize_time_stamp(settings.time_stamp_range['min'], settings.time_stamp_range['max'])
+        if toggle:
+            scheduler.toggle()
+        return doses_on_hand
+
     for date in blank_log:
         if doses_on_hand > 1:
             if date.bleeds_list:
@@ -235,17 +236,17 @@ def add_infusions_to_log(blank_log: list, settings: setup.Settings) -> list:
                             scheduler.toggle()
                         continue
                     if date.weekday() not in scheduler.current_schedule:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings, toggle=True)
+                        doses_on_hand = infuse(toggle=True)
                     else:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings)
+                        doses_on_hand = infuse()
                 else:
                     if date.weekday() not in scheduler.current_schedule:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings, toggle=True)
+                        doses_on_hand = infuse(toggle=True)
                     else:
-                        doses_on_hand = infuse(date, doses_on_hand, scheduler, settings)
+                        doses_on_hand = infuse()
             elif date.weekday() in scheduler.current_schedule:
                 infusion_log.append(date)
-                doses_on_hand = infuse(date, doses_on_hand, scheduler, settings)
+                doses_on_hand = infuse()
             else:
                 if date.weekday() == 6:
                     scheduler.reset()
