@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Settings:
+class SettingsHandler:
     number_of_bleeds: int
     time_stamp_range: dict
     schedules: dict
@@ -44,14 +44,14 @@ def load_settings():
         raise
 
 
-def save_settings(updated_settings: Settings) -> None:
+def save_settings(updated_settings: SettingsHandler) -> None:
     settings_dict = updated_settings.__dict__
     with open("settings.json", 'w') as json_file:
         json.dump(settings_dict, json_file)
 
 
 def make_settings_object(settings_dict):
-    settings_obj = Settings(**settings_dict)
+    settings_obj = SettingsHandler(**settings_dict)
     return settings_obj
 
 
