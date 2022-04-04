@@ -287,7 +287,7 @@ def generate_log(settings) -> list:
     starting_date, manual_bepisodes = get_all_inputs()
     max_possible_days = get_max_days(starting_date.weekday())
 
-    bepisode_list = fill_bepisode_list(3, starting_date, max_possible_days, manual_bepisodes)
+    bepisode_list = fill_bepisode_list(settings.number_of_bleeds, starting_date, max_possible_days, manual_bepisodes)
     blank_log = generate_dates(starting_date, max_possible_days)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
