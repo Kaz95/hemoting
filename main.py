@@ -4,7 +4,7 @@ import random
 import csv
 from typing import Final
 from dataclasses import dataclass, field
-import setup
+import settings
 
 # Some constants to help write days for Date class in a more readable form
 MONDAY: Final = 0
@@ -207,7 +207,7 @@ def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_p
 # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
 # A new list will be created with Date objects that meet certain criteria.
 # Criterion includes: Was infused, had corresponding Bepisode, or both.
-def add_infusions_to_log(blank_log: list, settings: setup.Settings) -> list:
+def add_infusions_to_log(blank_log: list, settings_handler: settings.SettingsHandler) -> list:
     doses_on_hand = 12
     infusion_log = []
     scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
@@ -219,7 +219,7 @@ def add_infusions_to_log(blank_log: list, settings: setup.Settings) -> list:
         nonlocal doses_on_hand
         date.infused = True
         doses_on_hand -= 1
-        date.randomize_time_stamp(settings.time_stamp_range['min'], settings.time_stamp_range['max'])
+        date.randomize_time_stamp(settings_handler.time_stamp_range['min'], settings_handler.time_stamp_range['max'])
         if toggle:
             scheduler.toggle()
         return doses_on_hand
@@ -283,15 +283,15 @@ def get_all_inputs() -> tuple[Date, list]:
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
-def generate_log(settings) -> list:
+def generate_log(settings_handler) -> list:
     starting_date, manual_bepisodes = get_all_inputs()
     max_possible_days = get_max_days(starting_date.weekday())
 
-    bepisode_list = fill_bepisode_list(settings.number_of_bleeds, starting_date, max_possible_days, manual_bepisodes)
+    bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days, manual_bepisodes)
     blank_log = generate_dates(starting_date, max_possible_days)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
-    full_log = add_infusions_to_log(log_with_bleeds, settings)
+    full_log = add_infusions_to_log(log_with_bleeds, settings_handler)
 
     return full_log
 
@@ -357,13 +357,13 @@ def print_menu_options() -> None:
 
 
 def main() -> None:
-    settings = setup.initialize_settings()
+    setting_handler = settings.initialize_settings()
     while True:
         print_menu_header()
         print_menu_options()
         selection = input('What do?: ')
         if selection == '1':
-            log = generate_log(settings)
+            log = generate_log(setting_handler)
             print_log(log)
             output_log_to_csv(log)
         elif selection == '4':
