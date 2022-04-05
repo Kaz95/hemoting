@@ -5,6 +5,7 @@ import csv
 from typing import Final
 from dataclasses import dataclass, field
 import settings
+from collections.abc import Iterable
 
 # Some constants to help write days for Date class in a more readable form
 MONDAY: Final = 0
@@ -50,7 +51,7 @@ class Date(datetime.date):
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
 class ScheduleHandler:
-    schedule = tuple[int, int, int]
+    schedule = Iterable[int, int, int]
 
     normal_prophey_schedule: schedule
     alternative_prophey_schedule: schedule
@@ -415,6 +416,6 @@ def main() -> None:
 #  A schedule is a tuple of three integers, but I'm not currently enforcing the range of those integers.
 # TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
 if __name__ == '__main__':
-    # main()
-    da = Date(2022, 2, 2)
-    da.randomize_time_stamp(0, 10)
+    main()
+    # da = Date(2022, 2, 2)
+    # da.randomize_time_stamp(0, 10)
