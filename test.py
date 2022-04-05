@@ -1,3 +1,4 @@
+import datetime
 import unittest
 import main
 import settings
@@ -19,7 +20,18 @@ class TestDate(unittest.TestCase):
         self.assertRaises(ValueError, self.date.randomize_time_stamp, starting_hour=6, ending_hour=0)
 
     def test_randomize_time_stamp_range_works(self):
-        pass
+        lower_range = 7
+        upper_range = 10
+
+        # Test timestamp was applied within the correct range.
+        self.date.randomize_time_stamp(lower_range, upper_range)
+        self.assertTrue(lower_range <= self.date.time_stamp.hour <= upper_range)
+
+        # Test to make sure this test is actually doing anything....lol. Can probably remove.
+        # Good example though. Shows a test can be written for the sole purpose of checking what your actual test -
+        # is doing. I now know the above test is checking for the hour attribute of a datetime.time object.
+        self.date.time_stamp = datetime.time(hour=11)
+        self.assertFalse(lower_range <= self.date.time_stamp.hour <= upper_range)
 
 
 class TestScheduleHandler(unittest.TestCase):
