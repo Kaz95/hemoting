@@ -42,7 +42,8 @@ class Date(datetime.date):
     # TODO: I need to enforce this comment. Numbers outside range should throw an error.
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
-
+        if 1 <= (starting_hour or ending_hour) <= 24:
+            raise ValueError
         randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
         randomized_minute = random.randrange(1, 60)
         self.time_stamp = datetime.time(hour=randomized_hour, minute=randomized_minute)
@@ -415,4 +416,6 @@ def main() -> None:
 #  A schedule is a tuple of three integers, but I'm not currently enforcing the range of those integers.
 # TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
 if __name__ == '__main__':
-    main()
+    # main()
+    da = Date(2022, 2, 2)
+    da.randomize_time_stamp(0, 10)
