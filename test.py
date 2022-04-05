@@ -14,8 +14,13 @@ class TestDate(unittest.TestCase):
         self.date.randomize_time_stamp(7, 10)
         self.assertIsNotNone(self.date.time_stamp)
 
+    def test_randomize_time_stamp_validates_inputs(self):
+        self.assertRaises(ValueError, self.date.randomize_time_stamp, starting_hour=0, ending_hour=6)
+        self.assertRaises(ValueError, self.date.randomize_time_stamp, starting_hour=6, ending_hour=0)
 
-    def test_randomize_time_stamp
+    def test_randomize_time_stamp_range_works(self):
+        pass
+
 
 class TestScheduleHandler(unittest.TestCase):
     def setUp(self):
