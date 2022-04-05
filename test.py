@@ -1,5 +1,6 @@
 import unittest
 import main
+import settings
 
 
 class TestDate(unittest.TestCase):
@@ -9,14 +10,16 @@ class TestDate(unittest.TestCase):
     def tearDown(self):
         del self.date
 
-    def test_randomize_time_stamp(self):
+    def test_randomize_time_stamp_timestamp_is_applied(self):
         self.date.randomize_time_stamp(7, 10)
         self.assertIsNotNone(self.date.time_stamp)
 
 
+    def test_randomize_time_stamp
+
 class TestScheduleHandler(unittest.TestCase):
     def setUp(self):
-        self.handler = main.ScheduleHandler(main.normal_prophey_schedule, main.alternative_prophey_schedule)
+        self.handler = main.ScheduleHandler(settings.normal_prophey_schedule, settings.alternate_prophey_schedule)
 
     def tearDown(self):
         del self.handler

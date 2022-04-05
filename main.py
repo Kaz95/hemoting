@@ -42,6 +42,7 @@ class Date(datetime.date):
     # TODO: I need to enforce this comment. Numbers outside range should throw an error.
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
+
         randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
         randomized_minute = random.randrange(1, 60)
         self.time_stamp = datetime.time(hour=randomized_hour, minute=randomized_minute)
