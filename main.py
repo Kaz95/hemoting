@@ -43,10 +43,11 @@ class Date(datetime.date):
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
         if 1 <= (starting_hour or ending_hour) <= 24:
-            raise ValueError
-        randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
-        randomized_minute = random.randrange(1, 60)
-        self.time_stamp = datetime.time(hour=randomized_hour, minute=randomized_minute)
+            randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
+            randomized_minute = random.randrange(1, 60)
+            self.time_stamp = datetime.time(hour=randomized_hour, minute=randomized_minute)
+        else:
+            raise ValueError('Hour should be 1->24')
 
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
