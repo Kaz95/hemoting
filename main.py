@@ -33,13 +33,11 @@ class Date(datetime.date):
     def __new__(cls, year, month, day):
         return super().__new__(cls, year, month, day)
 
-    # TODO: this cannot take a dynamic amount of args, so I should be explicit.
     def __init__(self, year, month, day):
         self.bleeds_list = []  # Holds strings representing an active bleeding episode
         self.infused = False
         self.time_stamp = None
 
-    # TODO: I need to enforce this comment. Numbers outside range should throw an error.
     # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
     def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
         if 1 <= (starting_hour or ending_hour) <= 24:
