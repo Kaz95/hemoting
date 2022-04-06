@@ -140,7 +140,7 @@ def get_max_days(starting_weekday: int) -> int:
     elif starting_weekday in [THURSDAY, SATURDAY]:
         maximum_possible_days += 4
     else:
-        raise Exception('Weekday was out of range while calculating max possible days.')
+        raise ValueError('Weekday was out of range while calculating max possible days.')
     return maximum_possible_days
 
 
