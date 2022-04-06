@@ -87,27 +87,24 @@ class Bepisode:
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
-def validate_date_inputs(minimum, maximum, some_input):
-    if some_input.isdecimal():
-        some_input = int(some_input)
-        if minimum < some_input < maximum:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-
 # TODO: Don't think i can....Test...easily...
 # TODO: OK what if I mock input method w/ side effects? I can verify the length of the fake input list to be sure the -
 # TODO: func did not return on given inputs, but did continue accepting them. I could even verify stdout stream I spose.
 def _get_valid_date_input(minimum, maximum, unit):
     while True:
         answer = input(f'Enter {unit}: ')
-        if validate_date_inputs(minimum, maximum, answer):
-            return int(answer)
+
+        if answer.isdecimal():
+            answer = int(answer)
+        else:
+            print('That is not a number!')
+            continue
+
+        if answer in range(minimum, maximum + 1):
+            return answer
         else:
             print(f'{unit} out of range! Enter an integer in range {minimum} - {maximum}')
+            continue
 
 
 # TODO: Test..I guess I can verify the func and params via Partial attributes...That's actually super fucking useful.
