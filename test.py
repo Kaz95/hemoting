@@ -65,19 +65,27 @@ class TestScheduleHandler(unittest.TestCase):
 
 
 class TestBepisode(unittest.TestCase):
+    # TODO: I'm not sure how long this method will exist. I'm not testing it now.
     def test_project_dates(self):
         pass
 
 
 class TestPartialFunctionCreation(unittest.TestCase):
     def test_get_valid_day_input_creation(self):
-        pass
+        self.assertEqual(main.get_valid_day_input.func, main._get_valid_date_input)
+        self.assertEqual(main.get_valid_day_input.keywords,
+                         {'minimum': datetime.date.min.day, 'maximum': datetime.date.max.day,
+                          'unit': 'Day'})
 
     def test_get_valid_month_input_creation(self):
-        pass
+        self.assertEqual(main.get_valid_month_input.func, main._get_valid_date_input)
+        self.assertEqual(main.get_valid_month_input.keywords,
+                         {'minimum': datetime.date.min.month, 'maximum': datetime.date.max.month, 'unit': 'Month'})
 
     def test_get_valid_year_input_creation(self):
-        pass
+        self.assertEqual(main.get_valid_year_input.func, main._get_valid_date_input)
+        self.assertEqual(main.get_valid_year_input.keywords,
+                         {'minimum': datetime.date.min.year, 'maximum': datetime.date.max.year, 'unit': 'Year'})
 
 
 class TestPureFunctions(unittest.TestCase):
