@@ -117,11 +117,12 @@ get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime
                                          maximum=datetime.date.max.year, unit='Year')
 
 
-def make_date():
+def get_date_input():
     year = get_valid_year_input()
     month = get_valid_month_input()
     day = get_valid_day_input()
-    return Date(year, month, day)
+    return year, month, day
+    # return Date(year, month, day)
 
 
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
@@ -267,7 +268,8 @@ def get_manual_bleeds() -> list:
     while True:
         answer = input('Add Manual Bepisode? ')
         if answer.capitalize() == 'Y':
-            starting_date = make_date()
+            year, month, day = get_date_input()
+            starting_date = Date(year, month, day)
             location = input('Enter Bleed location ')
             duration = int(input('Enter Numerical Duration '))
             bepisode = Bepisode(starting_date, location, duration)
@@ -279,7 +281,8 @@ def get_manual_bleeds() -> list:
 
 # TODO: Add real comment/decide if I actually want to use this.
 def get_all_inputs() -> tuple[Date, list]:
-    starting_date = make_date()
+    year, month, day = get_date_input()
+    starting_date = Date(year, month, day)
     manual_bepisodes = get_manual_bleeds()
     return starting_date, manual_bepisodes
 
