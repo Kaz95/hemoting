@@ -62,6 +62,8 @@ class ScheduleHandler:
         self.alternate_schedule = alternate_schedule
         self.current_schedule = normal_schedule
 
+    # TODO: This will toggle ANYTHING that isn't the normal schedule back to normal schedule.
+    # TODO: There is an implicit reset. I'm not sure how I feel about that.
     def toggle(self) -> None:
         if self.current_schedule == self.normal_schedule:
             self.current_schedule = self.alternate_schedule
