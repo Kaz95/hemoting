@@ -128,6 +128,10 @@ def get_date_input():
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # TODO: Figured out by hand, consider how I could have done this using math.
+# TODO: Use of magic #s are hindering testing. Only way to test current implementation is...more magic #s.
+# TODO: I'd only be testing that I haven't changed them, which is to say they don't test anything.
+# TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
+# TODO: Bepisodes would continue to be created within this new smaller window as well.
 def get_max_days(starting_weekday: int) -> int:
     maximum_possible_days = 21
     # Mon or Wed
