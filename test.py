@@ -35,6 +35,7 @@ class TestDate(unittest.TestCase):
 
 
 class TestScheduleHandler(unittest.TestCase):
+    # Create handler with program defaults.
     def setUp(self):
         self.handler = main.ScheduleHandler(settings.normal_prophey_schedule, settings.alternate_prophey_schedule)
 
@@ -42,13 +43,25 @@ class TestScheduleHandler(unittest.TestCase):
         del self.handler
 
     def test_default_current_schedule(self):
-        pass
+        self.assertEqual(self.handler.current_schedule, self.handler.normal_schedule)
 
     def test_toggle(self):
-        pass
+        # Confirm expected state.
+        assert self.handler.current_schedule == self.handler.normal_schedule
+
+        self.handler.toggle()
+        self.assertEqual(self.handler.current_schedule, self.handler.alternate_schedule)
+        self.handler.toggle()
+        self.assertEqual(self.handler.current_schedule, self.handler.normal_schedule)
 
     def test_reset(self):
-        pass
+        # Confirm expected state
+        assert self.handler.normal_schedule != self.handler.alternate_schedule
+
+        # Then test toggle functionality now that you can be sure something is actually being done when you toggle.
+        self.handler.current_schedule = self.handler.alternate_schedule
+        self.handler.reset()
+        self.assertEqual(self.handler.current_schedule, self.handler.normal_schedule)
 
 
 class TestBepisode(unittest.TestCase):
