@@ -2,6 +2,7 @@ import datetime
 import unittest
 import main
 import settings
+from unittest.mock import patch
 
 
 class TestDate(unittest.TestCase):
@@ -93,14 +94,38 @@ class TestPureFunctions(unittest.TestCase):
     def test_get_valid_date_inputs(self):
         pass
 
-    def test_make_date(self):
-        pass
+    # TODO: Im not even sure this is worth testing...
+    # Spoiler, I tested it anyway. Tried to mock the entire main module, but didn't work. Try again later.
+    @patch('main.get_valid_day_input')
+    @patch('main.get_valid_month_input')
+    @patch('main.get_valid_year_input')
+    def test_get_date_input(self, mock_get_valid_year_input, mock_get_valid_month_input, mock_get_valid_day_input):
+        mock_get_valid_year_input.return_value = 2022
+        mock_get_valid_month_input.return_value = 2
+        mock_get_valid_day_input.return_value = 2
 
-    def test_get_max_days(self):
-        pass
+        self.assertEqual(main.get_date_input(), (2022, 2, 2))
+
+    def test_get_max_days_validates_inputs(self):
+        # Make sure there is some range that doesn't raise ValueError
+        for _ in range(7):
+            with self.subTest(_=_):
+                self.assertIsNotNone(main.get_max_days(_))
+
+        # Make sure values outside that range, do raise ValueError
+        self.assertRaises(ValueError, main.get_max_days, -1)
+        self.assertRaises(ValueError, main.get_max_days, 7)
 
     def test_generate_dates(self):
-        pass
+        start_date = main.Date(2022, 2, 2)
+        list_of_dates = main.generate_dates(start_date, 3)
+        # Test right amount of Date objects were created.
+        self.assertEqual(len(list_of_dates), 3)
+        # Test correct objects were created.
+        for date in list_of_dates:
+            index = list_of_dates.index(date)
+            with self.subTest(date=date, index=index):
+                self.assertEqual(date, start_date + datetime.timedelta(index))
 
     def test_randomize_bleed_episode_start(self):
         pass
