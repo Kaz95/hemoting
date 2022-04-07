@@ -162,6 +162,7 @@ def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) 
     return bleed_start_date
 
 
+# TODO: Relies on global list. Change to receive list as arg.
 # Chooses and returns a random string from bleed locations list
 def randomize_bleed_location() -> str:
     bleed_location_index = random.randrange(len(bleed_locations))
@@ -169,6 +170,7 @@ def randomize_bleed_location() -> str:
     return bleed_location
 
 
+# TODO: Change this to a setting that gets loaded and injected.
 # TODO: Magic #
 def randomize_bleed_duration() -> int:
     return random.randrange(1, 5)

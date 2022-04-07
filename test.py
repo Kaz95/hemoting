@@ -144,19 +144,17 @@ class TestPureFunctions(unittest.TestCase):
             self.assertEqual(bep_start, expected_date)
             self.assertIsInstance(bep_start, main.Date)
 
-
-        # TODO: Mock randrange return value
-        # TODO: Assert called with on timedelta?
-        # TODO: Check type, properties, of return. Should be able to assert based on mocked randrange.
-
-
+    # TODO: Test once you clean TODO comment in main.py
     def test_randomize_bleed_location(self):
         pass
 
+    # TODO: Test once you clean TODO comment in main.py
     def test_randomize_bleed_duration(self):
         pass
 
     def test_randomize_bleed_episode(self):
+        # TODO: Mock the three function calls, that build attributes, with known return values
+        # TODO: Test type, properties, number of mock calls, and args passed.
         pass
 
     def test_couple_bleeds_to_dates(self):
