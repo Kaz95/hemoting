@@ -132,6 +132,7 @@ def get_date_input():
 # TODO: I'd only be testing that I haven't changed them, which is to say they don't test anything.
 # TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
 # TODO: Bepisodes would continue to be created within this new smaller window as well.
+# TODO: Also, what happens when I pass a decimal into this? Pretty sure it will raise a value error no matter what.
 def get_max_days(starting_weekday: int) -> int:
     maximum_possible_days = 21
     # Mon or Wed
@@ -149,8 +150,8 @@ def get_max_days(starting_weekday: int) -> int:
 
 
 # Creates and returns a list of Date objects within a range based on input.
-def generate_dates(starting_date: Date, maximum_possible_days: int) -> list:
-    blank_log = [starting_date + datetime.timedelta(_) for _ in range(maximum_possible_days)]
+def generate_dates(starting_date: Date, days_added: int) -> list:
+    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
     return blank_log
 
 
