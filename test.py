@@ -130,7 +130,8 @@ class TestPureFunctions(unittest.TestCase):
                 self.assertEqual(date, start_date + datetime.timedelta(index))
 
     def test_randomize_bleed_episode_start(self):
-        pass
+        # TODO: Mock randrange return value
+        # TODO: Assert called with on timedelta? I'm already mocking it though...
 
     def test_randomize_bleed_location(self):
         pass
