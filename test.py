@@ -129,9 +129,26 @@ class TestPureFunctions(unittest.TestCase):
                 self.assertIsInstance(date, main.Bepisode)
                 self.assertEqual(date, start_date + datetime.timedelta(index))
 
-    def test_randomize_bleed_episode_start(self):
+    @patch('random.randrange')
+    def test_randomize_bleed_episode_start(self, mock_randrange):
+        starting_date = main.Date(2022, 2, 2)
+        expected_date = main.Date(2022, 2, 4)
+        mock_randrange.return_value = 2
+        known_delta = datetime.timedelta(2)
+        with patch('datetime.timedelta') as mock_timedelta:
+            mock_timedelta.return_value = known_delta
+            bep_start = main.randomize_bleed_episode_start(starting_date, 10)
+
+            mock_randrange.assert_called_once_with(1, 10)
+            mock_timedelta.assert_called_once_with(2)
+            self.assertEqual(bep_start, expected_date)
+            self.assertIsInstance(bep_start, main.Date)
+
+
         # TODO: Mock randrange return value
-        # TODO: Assert called with on timedelta? I'm already mocking it though...
+        # TODO: Assert called with on timedelta?
+        # TODO: Check type, properties, of return. Should be able to assert based on mocked randrange.
+
 
     def test_randomize_bleed_location(self):
         pass
