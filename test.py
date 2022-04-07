@@ -121,10 +121,12 @@ class TestPureFunctions(unittest.TestCase):
         list_of_dates = main.generate_dates(start_date, 3)
         # Test right amount of Date objects were created.
         self.assertEqual(len(list_of_dates), 3)
-        # Test correct objects were created.
+
+        # Test correct objects were created with correct parameters.
         for date in list_of_dates:
             index = list_of_dates.index(date)
             with self.subTest(date=date, index=index):
+                self.assertIsInstance(date, main.Bepisode)
                 self.assertEqual(date, start_date + datetime.timedelta(index))
 
     def test_randomize_bleed_episode_start(self):
