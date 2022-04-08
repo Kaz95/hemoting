@@ -174,16 +174,33 @@ class TestPureFunctions(unittest.TestCase):
 
     # TODO: Test once you clean TODO comment in main.py
     def test_couple_bleeds_to_dates(self):
-
         pass
 
-    def test_fill_bepisode_list(self):
-        # TODO: Create a couple of bep lists. One empty one not.
-        # TODO: Mock main.randomize_bleed_episode
-        # TODO: Mock main.Bepisode.project_dates
-        # TODO: Assert return(type, length, object equality) and mocks(called (x) times with (y) args.
-        # TODO: ye...
-        pass
+    @patch('main.randomize_bleed_episode')
+    @patch('main.Bepisode.project_dates')
+    def test_fill_bepisode_list(self, mock_project_dates, mock_randomize_bleed_episode):
+        test_date = main.Date(2022, 2, 2)
+        test_bepisode = main.Bepisode(test_date, 'location', 2)
+        number_of_bleeds_set = 3
+        duration = 2
+        test_bep_list = [test_bepisode]
+        mock_randomize_bleed_episode.return_value = test_bepisode
+
+        # Test empty list route
+        bep_list = main.fill_bepisode_list(number_of_bleeds_set, test_date, duration, [])
+        self.assertEqual(len(bep_list), number_of_bleeds_set)
+        self.assertEqual(mock_project_dates.call_count, len(bep_list))
+        self.assertEqual(mock_randomize_bleed_episode.call_count, number_of_bleeds_set)
+
+        # Test partially filled list route
+        mock_randomize_bleed_episode.reset_mock()
+        mock_project_dates.reset_mock()
+
+        bep_list = main.fill_bepisode_list(number_of_bleeds_set, test_date, duration, test_bep_list)
+
+        self.assertEqual(len(bep_list), number_of_bleeds_set)
+        self.assertEqual(mock_project_dates.call_count, len(bep_list))
+        self.assertEqual(mock_randomize_bleed_episode.call_count, 2)
 
     def test_infuse(self):
         pass
