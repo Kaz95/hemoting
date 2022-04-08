@@ -231,7 +231,6 @@ def add_infusions_to_log(blank_log: list, settings_handler: settings.SettingsHan
     scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
 
     # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
-    # TODO: Could this be defined inside add_infusions_to_log()??? One bonus would be access to local vars.
     def infuse(toggle: bool = False) -> int:
         nonlocal doses_on_hand
         date.infused = True
