@@ -178,7 +178,8 @@ class TestPureFunctions(unittest.TestCase):
 
     @patch('main.randomize_bleed_episode')
     @patch('main.Bepisode.project_dates')
-    def test_fill_bepisode_list(self, mock_project_dates, mock_randomize_bleed_episode):
+    @patch('main.print')  # Decided to patch out print to avoid messy terminal during testing
+    def test_fill_bepisode_list(self, mock_print, mock_project_dates, mock_randomize_bleed_episode):
         test_date = main.Date(2022, 2, 2)
         test_bepisode = main.Bepisode(test_date, 'location', 2)
         number_of_bleeds_set = 3
