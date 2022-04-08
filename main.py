@@ -201,6 +201,9 @@ def couple_bleeds_to_dates(bepisodes_list: list, log: list) -> list:
 
 # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
 # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
+# TODO: Consider using a closure on randomize_bleed_episode to avoid passing so many args.
+#  2 of 3 args arent used by parent func. Also this function ALWAYS expects a bep list.
+#  Maybe it should create an empty one if no list is passed? Also this modifies the original list...not sure if matters.
 def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days_added: int,
                        bepisode_list: list) -> list:
     while len(bepisode_list) < number_of_bleeds_set:
