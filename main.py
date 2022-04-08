@@ -183,6 +183,7 @@ def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int) -> 
     return Bepisode(bleed_start_date, location, duration)
 
 
+# TODO: This is on the list for a refactor. Test later.
 # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
 # If one is found, the Date object will have its bleed list updated with a string.
 # The string represents the location of the aforementioned bleed.

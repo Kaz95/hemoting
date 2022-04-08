@@ -152,12 +152,33 @@ class TestPureFunctions(unittest.TestCase):
     def test_randomize_bleed_duration(self):
         pass
 
-    def test_randomize_bleed_episode(self):
-        # TODO: Mock the three function calls, that build attributes, with known return values
-        # TODO: Test type, properties, number of mock calls, and args passed.
-        pass
+    @patch('main.randomize_bleed_duration')
+    @patch('main.randomize_bleed_location')
+    @patch('main.randomize_bleed_episode_start')
+    def test_randomize_bleed_episode(self, mock_start, mock_location, mock_duration):
+        de = main.Date(2022, 2, 2)
+        mock_start.return_value = de
+        mock_location.return_value = 'Some Location'
+        mock_duration.return_value = 3
 
+        test_bepisode = main.randomize_bleed_episode(de, 2)
+
+        self.assertIsInstance(test_bepisode, main.Bepisode)
+        self.assertEqual(test_bepisode.start_date, de)
+        self.assertEqual(test_bepisode.location, 'Some Location')
+        self.assertEqual(test_bepisode.duration, 3)
+
+        mock_start.assert_called_once_with(de, 2)
+        mock_location.assert_called_once()
+        mock_duration.assert_called_once()
+
+    # TODO: Test once you clean TODO comment in main.py
     def test_couple_bleeds_to_dates(self):
+        # TODO: Create a couple of bep lists. One empty one not.
+        # TODO: Mock main.randomize_bleed_episode
+        # TODO: Mock main.Bepisode.project_dates
+        # TODO: Assert return(type, length, object equality) and mocks(called (x) times with (y) args.
+        # TODO: ye...
         pass
 
     def test_fill_bepisode_list(self):
