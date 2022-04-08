@@ -203,23 +203,32 @@ class TestPureFunctions(unittest.TestCase):
         self.assertEqual(mock_project_dates.call_count, len(bep_list))
         self.assertEqual(mock_randomize_bleed_episode.call_count, 2)
 
+    # TODO: I'm not even sure how to go about testing a nested func atm.
     def test_infuse(self):
         pass
 
+    # TODO: This is a donger of a fookin test m8. Do it later.
     def test_add_infusions_to_log(self):
         pass
 
+    # TODO: One of those crappy while loop situations. Mock out input? With side effects probably...?
     def test_get_manual_bleeds(self):
         pass
 
     def test_get_all_inputs(self):
+        # TODO: Mock get_date_input | return value | Assert called once
+        # TODO: Mock get_manual_bleeds | return value | Asser called once
+        # TODO: Assert return | Type | Length | members
         pass
 
     def test_generate_log(self):
+        # TODO: Wait its all mock? Always was.
         pass
 
     def test_make_csv_title(self):
+        # TODO: This one's easy, stop complaining. Almost done.
         pass
 
     def test_output_log_to_csv(self):
+        # TODO: ....yup
         pass
