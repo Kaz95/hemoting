@@ -215,11 +215,23 @@ class TestPureFunctions(unittest.TestCase):
     def test_get_manual_bleeds(self):
         pass
 
-    def test_get_all_inputs(self):
-        # TODO: Mock get_date_input | return value | Assert called once
-        # TODO: Mock get_manual_bleeds | return value | Asser called once
-        # TODO: Assert return | Type | Length | members
-        pass
+    @patch('main.get_manual_bleeds')
+    @patch('main.get_date_input')
+    def test_get_all_inputs(self, mock_get_date_input, mock_get_manual_bleeds):
+        year, month, day = mock_get_date_input.return_value = (2022, 2, 2)
+        # didn't use actual bepisode in list to reinforce that this func doesn't about that.
+        mock_get_manual_bleeds.return_value = ['yup']
+
+        starting_date, manual_bepisodes = inputs = main.get_all_inputs()
+        # TODO: Pretty sure the unpacking with fail before len assert...not sure why its here...
+        self.assertEqual(len(inputs), 2)
+        self.assertIsInstance(starting_date, main.Date)
+        self.assertEqual(starting_date.year, year)
+        self.assertEqual(starting_date.month, month)
+        self.assertEqual(starting_date.day, day)
+
+        mock_get_date_input.assert_called_once()
+        mock_get_manual_bleeds.assert_called_once()
 
     def test_generate_log(self):
         # TODO: Wait its all mock? Always was.
