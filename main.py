@@ -375,6 +375,8 @@ def print_menu_options() -> None:
     print()
 
 
+# TODO: Clean this up. Man....actually....this makes me feel bad to look at....fix it.
+#  Maybe new shiny pattern matching!
 def main() -> None:
     setting_handler = settings.initialize_settings()
     while True:
