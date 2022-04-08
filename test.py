@@ -174,14 +174,15 @@ class TestPureFunctions(unittest.TestCase):
 
     # TODO: Test once you clean TODO comment in main.py
     def test_couple_bleeds_to_dates(self):
+
+        pass
+
+    def test_fill_bepisode_list(self):
         # TODO: Create a couple of bep lists. One empty one not.
         # TODO: Mock main.randomize_bleed_episode
         # TODO: Mock main.Bepisode.project_dates
         # TODO: Assert return(type, length, object equality) and mocks(called (x) times with (y) args.
         # TODO: ye...
-        pass
-
-    def test_fill_bepisode_list(self):
         pass
 
     def test_infuse(self):
