@@ -324,13 +324,11 @@ def print_log(log: list) -> None:
             print(f'{date} - {date.infused} - Prophey')
 
 
+# TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
 # Creates a string title for csv files based on first and last item in a list of Date objects.
 def make_csv_title(log: list) -> str:
-    starting_date = log[0]
-    start_date_string = starting_date.strftime('%m-%d-%Y')
-    ending_date = log[-1]
-    end_date_string = ending_date.strftime('%m-%d-%Y')
-    csv_title = f'{start_date_string} - {end_date_string}'
+    starting_date, ending_date = log[0].strftime('%m-%d-%Y'), log[-1].strftime('%m-%d-%Y')
+    csv_title = f'{starting_date} - {ending_date}'
     return csv_title
 
 
