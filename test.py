@@ -126,7 +126,7 @@ class TestPureFunctions(unittest.TestCase):
         for date in list_of_dates:
             index = list_of_dates.index(date)
             with self.subTest(date=date, index=index):
-                self.assertIsInstance(date, main.Bepisode)
+                self.assertIsInstance(date, main.Date)
                 self.assertEqual(date, start_date + datetime.timedelta(index))
 
     @patch('random.randrange')
