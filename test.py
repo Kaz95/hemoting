@@ -233,14 +233,22 @@ class TestPureFunctions(unittest.TestCase):
         mock_get_date_input.assert_called_once()
         mock_get_manual_bleeds.assert_called_once()
 
+    # TODO: Test later. Too many patched funcs. No clear place to break it up. Will test when better UI
     def test_generate_log(self):
-        # TODO: Wait its all mock? Always was.
         pass
 
-    def test_make_csv_title(self):
-        # TODO: This one's easy, stop complaining. Almost done.
-        pass
+    # TODO: This test kinda sucks...
+    @patch('main.Date.strftime')
+    def test_make_csv_title(self, mock_strftime):
+        mock_strftime.return_value = 1
+        some_date = main.Date(2022, 2, 2)
+        some_other_date = main.Date(2022, 2, 4)
+        log = [some_date, some_other_date]
+
+        csv_title = main.make_csv_title(log)
+        self.assertEqual(csv_title, '1 - 1')
+        self.assertEqual(mock_strftime.call_count, 2)
 
     def test_output_log_to_csv(self):
-        # TODO: ....yup
+        # TODO: ....yup....nope actually
         pass
