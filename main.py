@@ -62,8 +62,6 @@ class ScheduleHandler:
         self.alternate_schedule = alternate_schedule
         self.current_schedule = normal_schedule
 
-    # TODO: This will toggle ANYTHING that isn't the normal schedule back to normal schedule.
-    # TODO: There is an implicit reset. I'm not sure how I feel about that.
     def toggle(self) -> None:
         if self.current_schedule == self.normal_schedule:
             self.current_schedule = self.alternate_schedule
@@ -74,8 +72,6 @@ class ScheduleHandler:
         self.current_schedule = self.normal_schedule
 
 
-# TODO: Make dates active a class var, append all projected dates to that and you can avoid a double loop later on.
-# TODO: Something, something, O(n**2) vs O(n). Use this as a real example to solidify your knowledge of BIG O notation
 @dataclass
 class Bepisode:
     start_date: Date
@@ -87,9 +83,6 @@ class Bepisode:
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
-# TODO: Don't think i can....Test...easily...
-# TODO: OK what if I mock input method w/ side effects? I can verify the length of the fake input list to be sure the -
-# TODO: func did not return on given inputs, but did continue accepting them. I could even verify stdout stream I spose.
 def _get_valid_date_input(minimum, maximum, unit):
     while True:
         answer = input(f'Enter {unit}: ')
@@ -107,8 +100,6 @@ def _get_valid_date_input(minimum, maximum, unit):
             continue
 
 
-# TODO: Test..I guess I can verify the func and params via Partial attributes...That's actually super fucking useful.
-# TODO: 100% better option then simple closure for testing purposes alone. Not to mention saving a crap ton of boiler plate.
 get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day,
                                         maximum=datetime.date.max.day, unit='Day')
 get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month,
@@ -162,7 +153,6 @@ def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) 
     return bleed_start_date
 
 
-# TODO: Relies on global list. Change to receive list as arg.
 # Chooses and returns a random string from bleed locations list
 def randomize_bleed_location() -> str:
     bleed_location_index = random.randrange(len(bleed_locations))
@@ -170,8 +160,6 @@ def randomize_bleed_location() -> str:
     return bleed_location
 
 
-# TODO: Change this to a setting that gets loaded and injected.
-# TODO: Magic #
 def randomize_bleed_duration() -> int:
     return random.randrange(1, 5)
 
@@ -348,7 +336,6 @@ def output_log_to_csv(log: list) -> None:
                 log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
 
 
-# TODO: Magic #
 # Helper function to print out a CLI menu
 def print_menu_border() -> None:
     for i in range(54):
@@ -373,8 +360,7 @@ def print_menu_options() -> None:
     print()
 
 
-# TODO: Clean this up. Man....actually....this makes me feel bad to look at....fix it.
-#  Maybe new shiny pattern matching!
+
 def main() -> None:
     setting_handler = settings.initialize_settings()
     while True:
@@ -427,7 +413,7 @@ def main() -> None:
 # TODO: Consider adding custom types that more closely adhere to the public contract.
 #  A schedule is a tuple of three integers, but I'm not currently enforcing the range of those integers.
 # TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
+# TODO: Add docstrings(?) look into it.
 if __name__ == '__main__':
     main()
-    # da = Date(2022, 2, 2)
-    # da.randomize_time_stamp(0, 10)
+
