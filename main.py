@@ -413,7 +413,6 @@ def main() -> None:
 # TODO: Consider adding custom types that more closely adhere to the public contract.
 #  A schedule is a tuple of three integers, but I'm not currently enforcing the range of those integers.
 # TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
-# TODO: Add docstrings(?) look into it.
 if __name__ == '__main__':
     main()
 
