@@ -161,7 +161,7 @@ def randomize_bleed_location() -> str:
 
 
 def randomize_bleed_duration() -> int:
-    return random.randrange(1, 5)
+    return random.randint(1, 4)
 
 
 def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int) -> Bepisode:
