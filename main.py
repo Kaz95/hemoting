@@ -5,7 +5,7 @@ import csv
 from typing import Final
 from dataclasses import dataclass, field
 import settings
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 
 # Some constants to help write days for Date class in a more readable form
 MONDAY: Final = 0
@@ -15,9 +15,6 @@ THURSDAY: Final = 3
 FRIDAY: Final = 4
 SATURDAY: Final = 5
 SUNDAY: Final = 6
-
-# Used to randomize bleed location. Nothing else.
-bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
 
 # Tuple of days of the week as used by the datetime class. Mon, Wed, Fri. Used as a schedule representation.
@@ -154,20 +151,22 @@ def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) 
 
 
 # Chooses and returns a random string from bleed locations list
-def randomize_bleed_location() -> str:
-    bleed_location_index = random.randrange(len(bleed_locations))
-    bleed_location = bleed_locations[bleed_location_index]
-    return bleed_location
+def randomize_bleed_location(locations: Sequence) -> str:
+    return random.choice(locations)
+    # bleed_location_index = random.randrange(len(bleed_locations))
+    # bleed_location = bleed_locations[bleed_location_index]
+    # return bleed_location
 
 
-def randomize_bleed_duration() -> int:
-    return random.randint(1, 4)
+def randomize_bleed_duration(minimum_duration: int, maximum_duration: int) -> int:
+    return random.randint(minimum_duration, maximum_duration)
 
 
-def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int) -> Bepisode:
+def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int, minimum_duration: int,
+                            maximum_duration: int, locations: Sequence) -> Bepisode:
     bleed_start_date = randomize_bleed_episode_start(starting_date, maximum_possible_days)
-    location = randomize_bleed_location()
-    duration = randomize_bleed_duration()
+    location = randomize_bleed_location(locations)
+    duration = randomize_bleed_duration(minimum_duration, maximum_duration)
     return Bepisode(bleed_start_date, location, duration)
 
 
@@ -193,9 +192,10 @@ def couple_bleeds_to_dates(bepisodes_list: list, log: list) -> list:
 #  2 of 3 args arent used by parent func. Also this function ALWAYS expects a bep list.
 #  Maybe it should create an empty one if no list is passed? Also this modifies the original list...not sure if matters.
 def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days_added: int,
-                       bepisode_list: list) -> list:
+                       bepisode_list: list, minimum_duration: int, maximum_duration: int, locations: Sequence) -> list:
     while len(bepisode_list) < number_of_bleeds_set:
-        bepisode = randomize_bleed_episode(starting_date, maximum_possible_days_added)
+        bepisode = randomize_bleed_episode(starting_date, maximum_possible_days_added, minimum_duration,
+                                           maximum_duration, locations)
         bepisode_list.append(bepisode)
 
     for bepisode in bepisode_list:
@@ -294,7 +294,9 @@ def generate_log(settings_handler) -> list:
     max_possible_days = get_max_days(starting_date.weekday())
 
     bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days,
-                                       manual_bepisodes)
+                                       manual_bepisodes, settings_handler.bleed_duration_range['min'],
+                                       settings_handler.bleed_duration_range['max'], settings_handler.bleed_locations)
+
     blank_log = generate_dates(starting_date, max_possible_days)
 
     log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
@@ -360,7 +362,6 @@ def print_menu_options() -> None:
     print()
 
 
-
 def main() -> None:
     setting_handler = settings.initialize_settings()
     while True:
@@ -415,4 +416,3 @@ def main() -> None:
 # TODO: Consider freezing dataclasses, and generally leveraging them more in the program. They have unique features.
 if __name__ == '__main__':
     main()
-

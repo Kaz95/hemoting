@@ -1,6 +1,8 @@
 import json
 from dataclasses import dataclass
+from collections.abc import Sequence
 from functools import partial
+
 
 # TODO: Remember JSON doesn't know or care w/e a tuple is. That's on me.
 
@@ -10,14 +12,21 @@ class SettingsHandler:
     number_of_bleeds: int
     time_stamp_range: dict
     schedules: dict
+    bleed_duration_range: dict
+    bleed_locations: Sequence
 
+
+# Used to randomize bleed location. Nothing else.
+bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
 normal_prophey_schedule = (0, 2, 4)
 alternate_prophey_schedule = (1, 3, 5)
 
 settings_schema = {'number_of_bleeds': 3,
                    'time_stamp_range': {'min': 7, 'max': 10},
-                   'schedules': {'normal': normal_prophey_schedule, 'alternate': alternate_prophey_schedule}
+                   'schedules': {'normal': normal_prophey_schedule, 'alternate': alternate_prophey_schedule},
+                   'bleed_duration_range': {'min': 1, 'max': 4},
+                   'bleed_locations': bleed_locations
                    }
 
 

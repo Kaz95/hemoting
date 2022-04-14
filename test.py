@@ -161,7 +161,7 @@ class TestPureFunctions(unittest.TestCase):
         mock_location.return_value = 'Some Location'
         mock_duration.return_value = 3
 
-        test_bepisode = main.randomize_bleed_episode(de, 2)
+        test_bepisode = main.randomize_bleed_episode(de, 2, 1, 3, ['a sequence'])
 
         self.assertIsInstance(test_bepisode, main.Bepisode)
         self.assertEqual(test_bepisode.start_date, de)
@@ -188,7 +188,7 @@ class TestPureFunctions(unittest.TestCase):
         mock_randomize_bleed_episode.return_value = test_bepisode
 
         # Test empty list route
-        bep_list = main.fill_bepisode_list(number_of_bleeds_set, test_date, duration, [])
+        bep_list = main.fill_bepisode_list(number_of_bleeds_set, test_date, duration, [], 1, 3, ['a sequence'])
         self.assertEqual(len(bep_list), number_of_bleeds_set)
         self.assertEqual(mock_project_dates.call_count, len(bep_list))
         self.assertEqual(mock_randomize_bleed_episode.call_count, number_of_bleeds_set)
@@ -197,7 +197,7 @@ class TestPureFunctions(unittest.TestCase):
         mock_randomize_bleed_episode.reset_mock()
         mock_project_dates.reset_mock()
 
-        bep_list = main.fill_bepisode_list(number_of_bleeds_set, test_date, duration, test_bep_list)
+        bep_list = main.fill_bepisode_list(number_of_bleeds_set, test_date, duration, test_bep_list, 1, 3, ['a sequence'])
 
         self.assertEqual(len(bep_list), number_of_bleeds_set)
         self.assertEqual(mock_project_dates.call_count, len(bep_list))
