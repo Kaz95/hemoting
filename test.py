@@ -1,7 +1,6 @@
 import datetime
 import unittest
-import core
-import settings
+from src import settings, core
 from unittest.mock import patch
 
 
@@ -96,9 +95,9 @@ class TestPureFunctions(unittest.TestCase):
 
     # TODO: Im not even sure this is worth testing...
     # Spoiler, I tested it anyway. Tried to mock the entire main module, but didn't work. Try again later.
-    @patch('core.get_valid_day_input')
-    @patch('core.get_valid_month_input')
-    @patch('core.get_valid_year_input')
+    @patch('src.core.get_valid_day_input')
+    @patch('src.core.get_valid_month_input')
+    @patch('src.core.get_valid_year_input')
     def test_get_date_input(self, mock_get_valid_year_input, mock_get_valid_month_input, mock_get_valid_day_input):
         mock_get_valid_year_input.return_value = 2022
         mock_get_valid_month_input.return_value = 2
@@ -152,9 +151,9 @@ class TestPureFunctions(unittest.TestCase):
     def test_randomize_bleed_duration(self):
         pass
 
-    @patch('core.randomize_bleed_duration')
-    @patch('core.randomize_bleed_location')
-    @patch('core.randomize_bleed_episode_start')
+    @patch('src.core.randomize_bleed_duration')
+    @patch('src.core.randomize_bleed_location')
+    @patch('src.core.randomize_bleed_episode_start')
     def test_randomize_bleed_episode(self, mock_start, mock_location, mock_duration):
         de = core.Date(2022, 2, 2)
         mock_start.return_value = de
@@ -176,9 +175,9 @@ class TestPureFunctions(unittest.TestCase):
     def test_couple_bleeds_to_dates(self):
         pass
 
-    @patch('core.randomize_bleed_episode')
-    @patch('core.Bepisode.project_dates')
-    @patch('core.print')  # Decided to patch out print to avoid messy terminal during testing
+    @patch('src.core.randomize_bleed_episode')
+    @patch('src.core.Bepisode.project_dates')
+    @patch('src.core.print')  # Decided to patch out print to avoid messy terminal during testing
     def test_fill_bepisode_list(self, mock_print, mock_project_dates, mock_randomize_bleed_episode):
         test_date = core.Date(2022, 2, 2)
         test_bepisode = core.Bepisode(test_date, 'location', 2)
@@ -215,8 +214,8 @@ class TestPureFunctions(unittest.TestCase):
     def test_get_manual_bleeds(self):
         pass
 
-    @patch('core.get_manual_bleeds')
-    @patch('core.get_date_input')
+    @patch('src.core.get_manual_bleeds')
+    @patch('src.core.get_date_input')
     def test_get_all_inputs(self, mock_get_date_input, mock_get_manual_bleeds):
         year, month, day = mock_get_date_input.return_value = (2022, 2, 2)
         # didn't use actual bepisode in list to reinforce that this func doesn't about that.
@@ -238,7 +237,7 @@ class TestPureFunctions(unittest.TestCase):
         pass
 
     # TODO: This test kinda sucks...
-    @patch('core.Date.strftime')
+    @patch('src.core.Date.strftime')
     def test_make_csv_title(self, mock_strftime):
         mock_strftime.return_value = 1
         some_date = core.Date(2022, 2, 2)

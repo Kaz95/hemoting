@@ -4,7 +4,7 @@ import random
 import csv
 from typing import Final
 from dataclasses import dataclass, field
-import settings
+from src import settings
 from collections.abc import Iterable, Sequence
 
 # Some constants to help write days for Date class in a more readable form
