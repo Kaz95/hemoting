@@ -12,7 +12,7 @@ def parse_setting_command(setting: str, setting_handler: settings.SettingsHandle
         case 'time_stamp_range':
             # TODO: I might need to handle range validation here. Not sure atm.
             """Split -> turn to tuple -> set value """
-            digits = [int(char) for char in setting if setting.isdigit()]
+            digits = [int(char) for char in setting if char.isdigit()]
             match digits:
                 case [start, stop]:
                     setting_handler.time_stamp_range['min'] = start
@@ -21,7 +21,13 @@ def parse_setting_command(setting: str, setting_handler: settings.SettingsHandle
                     print(f'Too many digits in {digits!r}. Expected exactly 2 digits. Ex: 7->10, 7 10, 7-10, ect...')
             pass
         case 'schedules':
-            """Split -> turn to two tuples? -> set values"""
+            """
+                Split -> turn to two tuples? -> set values
+                I can split by doing something like grabbing all the digits, splitting them into two groups of 3
+                and turning them into tuples.
+                
+            """
+
             pass
         case 'bleed_duration_range':
             """Split -> turn to dict -> set values"""
