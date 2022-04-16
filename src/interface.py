@@ -5,7 +5,35 @@ import settings
 DEFAULT_DATE = core.Date(2022, 2, 2)
 
 
-def run_cli(setting_handler: core.ScheduleHandler):
+def parse_setting_command(setting: str, setting_handler: settings.SettingsHandler, value: str):
+    match setting:
+        case 'number_of_bleeds':
+            setting_handler.number_of_bleeds = value
+        case 'time_stamp_range':
+            # TODO: I might need to handle range validation here. Not sure atm.
+            """Split -> turn to tuple -> set value """
+            digits = [int(char) for char in setting if setting.isdigit()]
+            match digits:
+                case [start, stop]:
+                    setting_handler.time_stamp_range['min'] = start
+                    setting_handler.time_stamp_range['max'] = stop
+                case _:
+                    print(f'Too many digits in {digits!r}. Expected exactly 2 digits. Ex: 7->10, 7 10, 7-10, ect...')
+            pass
+        case 'schedules':
+            """Split -> turn to two tuples? -> set values"""
+            pass
+        case 'bleed_duration_range':
+            """Split -> turn to dict -> set values"""
+            pass
+        case 'bleed_locations':
+            """Split -> turn to tuple -> set value"""
+            pass
+        case _:
+            print(f'Setting: {setting!r} not recognized')
+
+
+def run_cli(setting_handler: settings.SettingsHandler):
     while True:
         command = input('$ ')
         match command.split():
@@ -22,6 +50,7 @@ def run_cli(setting_handler: core.ScheduleHandler):
                 settings.reset_settings()
             case ['update', setting, value]:
                 """Case for updating a given setting"""
+                parse_setting_command(setting, setting_handler, value)
                 pass
             case ['add', bepisode]:
                 """Case for adding manual bepisode"""
