@@ -289,8 +289,8 @@ def get_all_inputs() -> tuple[Date, list]:
 # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
 # Returns a list of Date objects that is ready for sifting.
 # Pretty much everything outside of creating a csv.
-def generate_log(settings_handler) -> list:
-    starting_date, manual_bepisodes = get_all_inputs()
+def generate_log(settings_handler, starting_date, manual_bepisodes) -> list:
+    # starting_date, manual_bepisodes = get_all_inputs()
     max_possible_days = get_max_days(starting_date.weekday())
 
     bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days,
@@ -369,7 +369,8 @@ def main() -> None:
         print_menu_options()
         selection = input('What do?: ')
         if selection == '1':
-            log = generate_log(setting_handler)
+            starting_date, manual_bepisodes = get_all_inputs()
+            log = generate_log(setting_handler, starting_date, manual_bepisodes)
             print_log(log)
             output_log_to_csv(log)
         elif selection == '3':
