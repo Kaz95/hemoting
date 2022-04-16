@@ -18,5 +18,22 @@ def run_cli():
                 log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
                 core.print_log(log)
                 core.output_log_to_csv(log)
+            case ['reset']:
+                """Case for resetting settings to defaults"""
+                pass
+            case ['update', setting, value]:
+                """Case for updating a given setting"""
+                pass
+            case ['add', bepisode]:
+                """Case for adding manual bepisode"""
+                pass
+            case ['remove', bepisode]:
+                """Case for removing a manual bepisode"""
+                # TODO: This will need some way of viewing current manual bepisodes
+                #  and then some way of uniquely identifying them so one can be chosen for deletion.
+                #  That can be done here or in its own case.
+            case ['list']:
+                """Case for listing all commands"""
+                pass
             case _:
                 print(f'Command {command!r} not found')  # !r flag is used to give output quotes around command.
