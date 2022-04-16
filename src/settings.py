@@ -50,8 +50,8 @@ def load_settings():
         raise
 
 
-def save_settings(updated_settings: SettingsHandler) -> None:
-    settings_dict = updated_settings.__dict__
+def save_settings(settings: SettingsHandler) -> None:
+    settings_dict = settings.__dict__
     with open("settings.json", 'w') as json_file:
         json.dump(settings_dict, json_file)
 
