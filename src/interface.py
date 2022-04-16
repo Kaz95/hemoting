@@ -20,7 +20,7 @@ def run_cli():
                 core.output_log_to_csv(log)
             case ['reset']:
                 """Case for resetting settings to defaults"""
-                pass
+                settings.reset_settings()
             case ['update', setting, value]:
                 """Case for updating a given setting"""
                 pass

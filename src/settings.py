@@ -56,6 +56,15 @@ def save_settings(updated_settings: SettingsHandler) -> None:
         json.dump(settings_dict, json_file)
 
 
+def reset_settings():
+    try:
+        with open("settings.json", 'w') as json_file:
+            json.dump(settings_schema, json_file)
+    except FileNotFoundError:
+        print('Settings file does\'nt exist yet.')
+        raise
+
+
 def make_settings_object(settings_dict):
     settings_obj = SettingsHandler(**settings_dict)
     return settings_obj
