@@ -60,6 +60,15 @@ def run_cli(setting_handler: settings.SettingsHandler):
                 # TODO: This will need some way of viewing current manual bepisodes
                 #  and then some way of uniquely identifying them so one can be chosen for deletion.
                 #  That can be done here or in its own case.
+            case ['list', option]:
+                """
+                   ~ Case for listing specific information. This could include, but is not limited to:
+                   - Current bepisodes
+                   - All current settings
+                   - A specific settings current value
+                   - ect.....
+                """
+                pass
             case ['list']:
                 """Case for listing all commands"""
                 pass
