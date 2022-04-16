@@ -2,6 +2,8 @@
 import core
 import settings
 
+DEFAULT_DATE = core.Date(2022, 2, 2)
+
 
 def run_cli():
     setting_handler = settings.initialize_settings()
@@ -12,7 +14,7 @@ def run_cli():
                 print('quitting...')
                 break
             case ['run' | 'go']:
-                starting_date, manual_bepisodes = core.get_all_inputs()
+                starting_date, manual_bepisodes = DEFAULT_DATE, []
                 log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
                 core.print_log(log)
                 core.output_log_to_csv(log)
