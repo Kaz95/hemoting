@@ -12,7 +12,8 @@ def run_cli():
                 print('quitting...')
                 break
             case ['run' | 'go']:
-                log = core.generate_log(setting_handler)
+                starting_date, manual_bepisodes = core.get_all_inputs()
+                log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
                 core.print_log(log)
                 core.output_log_to_csv(log)
             case _:
