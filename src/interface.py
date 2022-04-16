@@ -5,8 +5,7 @@ import settings
 DEFAULT_DATE = core.Date(2022, 2, 2)
 
 
-def run_cli():
-    setting_handler = settings.initialize_settings()
+def run_cli(setting_handler: core.ScheduleHandler):
     while True:
         command = input('$ ')
         match command.split():
