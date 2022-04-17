@@ -5,27 +5,42 @@ import settings
 DEFAULT_DATE = core.Date(2022, 2, 2)
 
 
-def parse_setting_command(setting: str, setting_handler: settings.SettingsHandler, value: str):
+def parse_setting_command(setting: str, settings_handler: settings.SettingsHandler, value: str):
     match setting:
         case 'number_of_bleeds':
-            setting_handler.number_of_bleeds = value
+            settings_handler.number_of_bleeds = int(value)
         case 'time_stamp_range':
             # TODO: I might need to handle range validation here. Not sure atm.
-            """Split -> turn to tuple -> set value """
+            match value.split('-'):
+                case [start, stop]:
+                    settings_handler.time_stamp_range['min'] = int(start)
+                    settings_handler.time_stamp_range['max'] = int(stop)
+                case _:
+                    print(f"Value: {value!r} is not the correct format. Expected 2 digits separated by a '-'")
+
         case 'schedules':
-            """Split -> turn to two tuples? -> set values"""
-            pass
+            match value.split('-'):
+                case [main, alternate]:
+                    main = [int(x) for x in main if x.isdigit()]
+                    alternate = [int(x) for x in alternate if x.isdigit()]
+                    settings_handler.schedules['normal'] = main
+                    settings_handler.schedules['alternate'] = alternate
+                case _:
+                    print(f"Value: {value!r} is not the correct format. Expected 2 sets of 3 digits separated by a '-'")
+
         case 'bleed_duration_range':
-            """Split -> turn to dict -> set values"""
-            pass
-        case 'bleed_locations':
-            """Split -> turn to tuple -> set value"""
-            pass
+            match value.split('-'):
+                case [start, stop]:
+                    settings_handler.bleed_duration_range['min'] = int(start)
+                    settings_handler.bleed_duration_range['max'] = int(stop)
+                case _:
+                    print(f"Value: {value!r} is not the correct format. Expected 2 digits separated by a '-'")
+
         case _:
             print(f'Setting: {setting!r} not recognized')
 
 
-def run_cli(setting_handler: settings.SettingsHandler):
+def run_cli(settings_handler: settings.SettingsHandler):
     while True:
         command = input('$ ')
         match command.split():
@@ -34,15 +49,13 @@ def run_cli(setting_handler: settings.SettingsHandler):
                 break
             case ['run' | 'go']:
                 starting_date, manual_bepisodes = DEFAULT_DATE, []
-                log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
+                log = core.generate_log(settings_handler, starting_date, manual_bepisodes)
                 core.print_log(log)
                 core.output_log_to_csv(log)
             case ['reset']:
-                """Case for resetting settings to defaults"""
-                settings.reset_settings()
+                settings.reset_settings(settings_handler)
             case ['update', setting, value]:
-                """Case for updating a given setting"""
-                parse_setting_command(setting, setting_handler, value)
+                parse_setting_command(setting, settings_handler, value)
                 pass
             case ['add', bepisode]:
                 """Case for adding manual bepisode"""
