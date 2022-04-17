@@ -41,6 +41,7 @@ def parse_setting_command(setting: str, settings_handler: settings.SettingsHandl
 
 
 def run_cli(settings_handler: settings.SettingsHandler):
+    manual_bepisodes = []
     while True:
         command = input('$ ')
         match command.split():
@@ -48,7 +49,7 @@ def run_cli(settings_handler: settings.SettingsHandler):
                 print('quitting...')
                 break
             case ['run' | 'go']:
-                starting_date, manual_bepisodes = DEFAULT_DATE, []
+                starting_date = DEFAULT_DATE
                 log = core.generate_log(settings_handler, starting_date, manual_bepisodes)
                 core.print_log(log)
                 core.output_log_to_csv(log)
