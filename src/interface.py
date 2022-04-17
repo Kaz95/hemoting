@@ -1,4 +1,6 @@
 """Module for implementing CLI and GUI"""
+import pprint
+
 import core
 import settings
 
@@ -40,6 +42,15 @@ def parse_setting_command(setting: str, settings_handler: settings.SettingsHandl
             print(f'Setting: {setting!r} not recognized')
 
 
+def parse_list_command(value: str, bepisodes: list, settings_handler: settings.SettingsHandler):
+    match value:
+        case "bepisodes":
+            for index, bepisode in enumerate(bepisodes):
+                print(f'{index + 1}.) {bepisode}')
+        case "settings":
+            pprint.pprint(settings_handler.__dict__)
+
+
 def run_cli(settings_handler: settings.SettingsHandler):
     manual_bepisodes = []
     while True:
@@ -71,13 +82,7 @@ def run_cli(settings_handler: settings.SettingsHandler):
                 #  That can be done here or in its own case.
 
             case ['list', option]:
-                """
-                   ~ Case for listing specific information. This could include, but is not limited to:
-                   - Current bepisodes
-                   - All current settings
-                   - A specific settings current value
-                   - ect.....
-                """
+                parse_list_command(option, manual_bepisodes, settings_handler)
                 pass
 
             case ['list']:
