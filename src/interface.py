@@ -48,24 +48,28 @@ def run_cli(settings_handler: settings.SettingsHandler):
             case ['quit' | 'q' | 'Q']:  # Brackets are needed to specify sequence, could also be () or a single ,
                 print('quitting...')
                 break
+
             case ['run' | 'go']:
                 starting_date = DEFAULT_DATE
                 log = core.generate_log(settings_handler, starting_date, manual_bepisodes)
                 core.print_log(log)
                 core.output_log_to_csv(log)
+
             case ['reset']:
                 settings.reset_settings(settings_handler)
+
             case ['update', setting, value]:
                 parse_setting_command(setting, settings_handler, value)
-                pass
-            case ['add', bepisode]:
-                """Case for adding manual bepisode"""
-                pass
+
+            case ['add']:
+                manual_bepisodes += core.get_manual_bleeds()
+
             case ['remove', bepisode]:
                 """Case for removing a manual bepisode"""
                 # TODO: This will need some way of viewing current manual bepisodes
                 #  and then some way of uniquely identifying them so one can be chosen for deletion.
                 #  That can be done here or in its own case.
+
             case ['list', option]:
                 """
                    ~ Case for listing specific information. This could include, but is not limited to:
@@ -75,8 +79,10 @@ def run_cli(settings_handler: settings.SettingsHandler):
                    - ect.....
                 """
                 pass
+
             case ['list']:
                 """Case for listing all commands"""
                 pass
+
             case _:
                 print(f'Command {command!r} not found')  # !r flag is used to give output quotes around command.
