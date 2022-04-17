@@ -56,15 +56,9 @@ def save_settings(settings: SettingsHandler) -> None:
         json.dump(settings_dict, json_file)
 
 
-# TODO: This doesn't require settings to be saved, and instead acts directly on the json file.
-#  This is not inline with other setting functionality. Decide if this is ok.
-def reset_settings():
-    try:
-        with open("settings.json", 'w') as json_file:
-            json.dump(settings_schema, json_file)
-    except FileNotFoundError:
-        print('Settings file does\'nt exist yet.')
-        raise
+def reset_settings(settings: SettingsHandler):
+    defaults = settings_schema
+    settings.__dict__ = defaults
 
 
 def make_settings_object(settings_dict):
