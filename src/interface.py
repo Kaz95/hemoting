@@ -5,7 +5,37 @@ import core
 import settings
 
 DEFAULT_DATE = core.Date(2022, 2, 2)
+""" 
+    Some thoughts on how the CLI will be implemented. First, the following structure will be used for commands:
+    
+    COMMAND <arguments>
+    
+    This will be the structure going forward. I may choose to add options or 'modes' later on. Command will correspond
+    to a string value in 'commands' dictionary. All available commands will be 'registered' in this dictionary. At the
+    moment I plan to add the following values in a 'command details' object...maybe a dataclass or something.
+    
+    - Receiver, or function that encapsulates all of the logic needed to carry out a given user command
+    - Command aliases, Ex: 'run' | 'go' | 'do the thing'
+    - Command description
+    
+    I will also need an 'invoker' function that will accept look something like:
 
+    def invoker(receiver, args):
+        receiver(*args)
+    
+    I will bind the original user input via match case like:
+    
+    match user_input.split():
+        case [cmd, *params] if cmd in commands_and_aliases:  # Where commands_and_aliases is a list...of what it says.
+            # Do a bunch of work here
+        case _:
+            print('Invalid command brother!)   
+    
+    Then I guess I'd use a 'controller' to decide to correct function to use. Maybe like:
+    
+    def controller(cmd
+    
+    """
 
 def parse_setting_command(setting: str, settings_handler: settings.SettingsHandler, value: str):
     match setting:
