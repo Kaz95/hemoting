@@ -11,14 +11,17 @@ DEFAULT_DATE = core.Date(2022, 2, 2)
     COMMAND <arguments>
     
     This will be the structure going forward. I may choose to add options or 'modes' later on. Command will correspond
-    to a string value in 'commands' dictionary. All available commands will be 'registered' in this dictionary. At the
-    moment I plan to add the following values in a 'command details' object...maybe a dataclass or something.
+    to a string value in 'commands' dictionary. All available commands will be 'registered' in this dictionary. 
+    
+    commands = {}
+    
+    At the moment I plan to add the following values in a 'command details' object...maybe a dataclass or something.
     
     - Receiver, or function that encapsulates all of the logic needed to carry out a given user command
     - Command aliases, Ex: 'run' | 'go' | 'do the thing'
     - Command description
     
-    I will also need an 'invoker' function that will accept look something like:
+    I will also need an 'invoker' function that will look something like:
 
     def invoker(receiver, args):
         receiver(*args)
@@ -31,11 +34,31 @@ DEFAULT_DATE = core.Date(2022, 2, 2)
         case _:
             print('Invalid command brother!)   
     
-    Then I guess I'd use a 'controller' to decide to correct function to use. Maybe like:
+    Then I guess I'd use a helper function to decide to correct function to use. Maybe like:
     
-    def controller(cmd
+    def get_receiver(cmd)
+        return commands[cmd]
+        
+    Then, I need a client to tie it all together:
     
+    def client(cmd, args, invoker):
+        receiver = get_receiver(cmd)
+        invoker(receiver, *(?)args)
+        
+    Hokay, so the flow of the execution will look something like:
+    
+    0.) Commands objects must be initialized and registered into 'commands' dictionary. I could har code them, but I
+        feel this approach is better. It allows be encapsulate a default set of commands, without hard coding multiple
+        dictionaries. Instead I create some factory(?) functions that build a known set of commands at runtime.
+    1.) User inputs command. This will hereby be referred to as: user_input
+    2.) user_input is validated and bound to variables by a split() call and a match case. 
+            a.) If command is expected format, variables now available: cmd: str, params: list 
+            b.) If command is invalid format, continue back to start of loop to get new user_input.
+    3.) Pass cmd and args into client function to perform the actual command. Optionally I can provide an invoker 
+        argument that can decide behavior surrounding a function call. Things like book keeping and modes.
+    4.) Something like that.
     """
+
 
 def parse_setting_command(setting: str, settings_handler: settings.SettingsHandler, value: str):
     match setting:
