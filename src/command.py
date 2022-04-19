@@ -13,7 +13,21 @@ class Command:
 
 
 class CommandSet(ABC):
-    pass
+    @abstractmethod
+    def get_receiver(self, cmd):
+        pass
+
+    @abstractmethod
+    def register_command(self, func: Callable, description: str, aliases: list[str]):
+        pass
+
+    @abstractmethod
+    def _register_base_commands(self):
+        pass
+
+    @abstractmethod
+    def list_commands(self):
+        pass
 
 
 class CLI(CommandSet):
