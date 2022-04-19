@@ -56,7 +56,38 @@ DEFAULT_DATE = core.Date(2022, 2, 2)
             b.) If command is invalid format, continue back to start of loop to get new user_input.
     3.) Pass cmd and args into client function to perform the actual command. Optionally I can provide an invoker 
         argument that can decide behavior surrounding a function call. Things like book keeping and modes.
-    4.) Something like that.
+    4.) Something like that. Honestly, the variable and function names kind of suck, but I'm trying to mirror the
+        Command Pattern to some extent, to better visualize how it applies to my more functional approach.
+        
+    ====================================================================================================================
+    
+    Hokay, what are the downsides to this approach?: 
+    
+    1.) The 'commands' dictionary would need to be global, or constantly injected as a dependency, or pulled from the
+        persistence layer. Non of which are ideal
+    2.) When I create more than on 'commands' dictionary, they will ALL need to be organized in some fashion
+    3.) Lack of namespace. The code would quickly turn to ravioli. 'commands' dictionary would quickly become:
+            a.) interface.cli_commands
+            b.) interface.gui_commands
+            c.) interface.extended_cli_commands
+            d.) interface.extended_gui_commands
+            e.) interface.extended_again_gui_commands
+            f.) ect, ect,.....
+        It would be very nice to have them name spaced in some manner. At the least classes in the same module would be:
+            a.) interface.cli.base_commands
+            b.) interface.gui.base_commands
+            c.) interface.cli.extended_commands
+            d.) ect, ect.....
+        While a full module of their own would be something like:
+            a.) commands.cli_base
+            b.) commands.gui_base
+            c.) commands.gui_extended
+            d.) commands.cli_extended
+        Whereas combining a dedicated module, and a class namespace would yield something like:
+            a.) commands.cli.base
+            b.) commands.cli.extended
+            c.) commands.gui.base
+            d.) commands.gui.extended
     """
 
 
