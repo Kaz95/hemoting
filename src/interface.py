@@ -135,6 +135,13 @@ def parse_list_command(value: str, bepisodes: list, settings_handler: settings.S
             pprint.pprint(settings_handler.__dict__)
 
 
+def run(settings_handler, starting_date, manual_bepisodes):
+    starting_date = DEFAULT_DATE
+    log = core.generate_log(settings_handler, starting_date, manual_bepisodes)
+    core.print_log(log)
+    core.output_log_to_csv(log)
+
+
 def run_cli(settings_handler: settings.SettingsHandler):
     manual_bepisodes = []
     while True:
