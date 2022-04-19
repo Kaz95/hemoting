@@ -64,4 +64,5 @@ class GUI(CommandSet):
 
 
 class CommandHandler:
-    pass
+    def __init__(self, command_set: CommandSet):
+        self.command_set = command_set
