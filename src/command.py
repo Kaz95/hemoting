@@ -13,6 +13,11 @@ class Command:
 
 
 class CommandSet(ABC):
+
+    def __init__(self):
+        self.commands = {}
+        self._register_base_commands()
+
     @abstractmethod
     def get_receiver(self, cmd):
         pass
