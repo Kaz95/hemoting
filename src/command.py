@@ -36,11 +36,31 @@ class CommandSet(ABC):
 
 
 class CLI(CommandSet):
-    pass
+    def get_receiver(self, cmd):
+        pass
+
+    def register_command(self, func: Callable, description: str, aliases: list[str]):
+        pass
+
+    def _register_base_commands(self):
+        pass
+
+    def list_commands(self):
+        pass
 
 
 class GUI(CommandSet):
-    pass
+    def get_receiver(self, cmd):
+        pass
+
+    def register_command(self, func: Callable, description: str, aliases: list[str]):
+        pass
+
+    def _register_base_commands(self):
+        pass
+
+    def list_commands(self):
+        pass
 
 
 class CommandHandler:
