@@ -51,7 +51,7 @@ class CommandSetHandler:
 
 
 # This could easily be a 'main' function. A class allows for namespacing, holding state(settings), and the coupling
-# of logic to the aforementioned state. Consider if this is the best solution later.
+# of logic to the aforementioned state. Consider if this is the best solution later. Right now main is acting as app.
 class App:
     pass
 
@@ -61,7 +61,6 @@ if __name__ == '__main__':
     cmd_handler = CommandSetHandler(cmd_set)
     interface_handler = CLI.Interface()
     while True:
-
         u_input = interface_handler.run()
         if u_input == 'q':
             break

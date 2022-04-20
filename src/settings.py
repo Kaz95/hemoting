@@ -1,7 +1,6 @@
 import json
-from dataclasses import dataclass
 from collections.abc import Sequence
-from functools import partial
+from dataclasses import dataclass
 
 
 # TODO: Remember JSON doesn't know or care w/e a tuple is. That's on me.

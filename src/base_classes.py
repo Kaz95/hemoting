@@ -1,8 +1,7 @@
 """Module for holding ABCs until I clean up core module"""
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Optional
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -17,9 +16,6 @@ class CommandInfo:
     number_of_args: int
     description: str
     aliases: list[str]
-
-    def __str__(self):
-        return f'{self.description}\n{self.aliases}'
 
 
 class CommandSet(ABC):
