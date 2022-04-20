@@ -9,10 +9,10 @@ class Interface(base_classes.Interface):
 
 
 class CommandSet(base_classes.CommandSet):
-    def get_receiver(self, cmd):
+    def get_receiver_info(self, cmd):
         pass
 
-    def register_command(self, func: Callable, description: str, aliases: list[str]):
+    def register_command(self, receiver: Callable, description: str, aliases: list[str]):
         pass
 
     def _register_commands(self):
