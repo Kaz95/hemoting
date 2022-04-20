@@ -5,7 +5,9 @@ from collections.abc import Callable
 
 class Interface(base_classes.Interface):
     def run(self):
-        pass
+        while True:
+            user_input = input('$ ')
+            print(user_input)  # TODO: handler user input here instead of printing
 
 
 class CommandSet(base_classes.CommandSet):
