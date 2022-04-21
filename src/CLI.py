@@ -10,26 +10,27 @@ import settings
 # A few test receiver functions. Receivers being a function that encapsulates all the logic needed to carry out
 # a command requested by the user.
 
-def _serialize_date_input(u_input: list):
-    dates = []
-    for arg in u_input:
-        match arg.split('-'):
-            case [year, month, day]:
-                year = int(year)
-                month = int(month)
-                day = int(day)
-                starting_date = core.Date(year, month, day)
-                dates.append(starting_date)
-    return dates
+def _serialize_date_input(u_input: str):
+    match u_input.split('-'):
+        case [year, month, day]:
+            year = int(year)
+            month = int(month)
+            day = int(day)
+            starting_date = core.Date(year, month, day)
+            return starting_date
 
 
-def run(starting_date: core.Date | list = core.Date(2022, 2, 2)):
-    # There has to be a better way to decide how the function was called. I'm using input type to allow this function
-    # to run with a default value when no arg is passed, and to operate on the argument, if there is one. Maybe I should
-    # accept only args, and if args, overload the default values with args?
-    if isinstance(starting_date, list):
-        dates = _serialize_date_input(starting_date)
-        starting_date = dates[0]
+def run(args=None):
+    match args:
+        case [user_date_input]:
+            starting_date = _serialize_date_input(user_date_input)
+        case _:
+            starting_date = core.Date(2022, 2, 2)
+
+    # if args:
+    #     starting_date = _serialize_date_input(args[0])
+    # else:
+    #     starting_date = core.Date(2022, 2, 2)
 
     setting_handler = settings.initialize_settings()
     manual_bepisodes = []
@@ -66,4 +67,5 @@ class Interface(base_classes.Interface):
                 case 'q' | 'Q':
                     print('Quitting...')
                     break
-            self.command_handler.handle_command(user_input)
+                case _:
+                    self.command_handler.handle_command(user_input)
