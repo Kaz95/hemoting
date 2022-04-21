@@ -82,7 +82,8 @@ class CommandSetHandler:
                 print('invalid input')
 
     # This feels like the invoker. To, more closely, follow the command pattern, I should split this method into two
-    # parts: 'create_command_from_user_input' and 'invoke'
+    # parts: 'create_command_from_user_input' and 'invoke'. Which actually makes no sense when you aren't forced into
+    # object orientation every step of the way.
     def handle_command(self, user_input):
         command = self._split_input(user_input)
         command.execute()
@@ -149,7 +150,3 @@ class App:
 
     def run(self):
         self.interface_handler.run()
-
-
-if __name__ == '__main__':
-    App.clean_up()
