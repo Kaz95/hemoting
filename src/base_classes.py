@@ -53,6 +53,15 @@ class CommandSetHandler:
         # This will not map to a GUI well. I WILL want an 'ls' command of some sort that returns the command registry
         # for the purposes of displaying some sort of key binds list in the GUI...Interface...I just realized I'm saying
         # ATM Machine.....fuck.
+        # Wait.....actually....
+        # If I implement the underlying CommandSet.print_all method correctly for the GUI.CommandSet class, I can leave
+        # this as is.
+        #   - I'll still want to use the handler to trigger the concrete implementation of the method.
+        #   - I'll still want a description of what the command is doing.
+        #   - I'll still want a list of aliases(KeyEvents and what not in GUI case) so I can build the commands registry
+        # So pretty much everything can be used in place. The handler don't give two shits. I'll need some way of what
+        # aliases to pass in. I could pass them all in all the time(CLI & GUI) or I need to move this somewhere else...
+        # maybe...probably...
         self.command_set.register_command(self.ls, "Lists all current commands in the current command set.",
                                           ['ls', 'list'])
 
