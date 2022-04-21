@@ -50,6 +50,8 @@ class CommandSet(ABC):
 class CommandSetHandler:
     def __init__(self, command_set: CommandSet):
         self.command_set = command_set
+        https: // w2.gomovies.fan / watch - series / watch - archer - season - 4 - full - episodes - online - free / gomovies - 5l
+        rp4pq - y65xako75z?watching = 2
         # This will not map to a GUI well. I WILL want an 'ls' command of some sort that returns the command registry
         # for the purposes of displaying some sort of key binds list in the GUI...Interface...I just realized I'm saying
         # ATM Machine.....fuck.
