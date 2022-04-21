@@ -50,8 +50,6 @@ class CommandSet(ABC):
 class CommandSetHandler:
     def __init__(self, command_set: CommandSet):
         self.command_set = command_set
-        https: // w2.gomovies.fan / watch - series / watch - archer - season - 4 - full - episodes - online - free / gomovies - 5l
-        rp4pq - y65xako75z?watching = 2
         # This will not map to a GUI well. I WILL want an 'ls' command of some sort that returns the command registry
         # for the purposes of displaying some sort of key binds list in the GUI...Interface...I just realized I'm saying
         # ATM Machine.....fuck.
@@ -64,7 +62,7 @@ class CommandSetHandler:
         # So pretty much everything can be used in place. The handler don't give two shits. I'll need some way of what
         # aliases to pass in. I could pass them all in all the time(CLI & GUI) or I need to move this somewhere else...
         # maybe...probably...
-        self.command_set.register_command(self.ls, "Lists all current commands in the current command set.",
+        self.command_set.register_command(self.ls, "Lists all commands in the current command set.",
                                           ['ls', 'list'])
 
     def _split_input(self, user_input):
@@ -89,18 +87,25 @@ class CommandSetHandler:
         command = self._split_input(user_input)
         command.execute()
 
-    def ls(self, option=None):
-        if option:
-            option = option[0]
-            self.ls_option(option)
-        else:
-            self.command_set.list_commands()
+    def ls(self, args=None):
+        match args:
+            case [user_cmd_argument]:
+                self.ls_command_info(user_cmd_argument)
+            case None:
+                self.command_set.list_commands()
+            case _:
+                print(f"Invalid Command. Expected 1 argument, got {len(args)} instead")
+        # if args:
+        #     option = args[0]
+        #     self.ls_command_info(option)
+        # else:
+        #     self.command_set.list_commands()
 
-    def ls_option(self, option):
-        cmd = self.command_set.command_info_registry[option]
-        print(f'Command: {option}')
-        print(f'Description: {cmd.description}')
-        print(f'Aliases: {cmd.aliases}')
+    def ls_command_info(self, cmd):
+        cmd_info = self.command_set.command_info_registry[cmd]
+        print(f'Command: {cmd}')
+        print(f'Description: {cmd_info.description}')
+        print(f'Aliases: {cmd_info.aliases}')
 
 
 class Interface(ABC):
