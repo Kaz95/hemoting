@@ -133,6 +133,7 @@ class InterfaceHandler:
 # This could easily be a 'main' function. A class allows for namespacing, holding state(settings), and the coupling
 # of logic to the aforementioned state. Consider if this is the best solution later. Right now main is acting as app.
 class App:
+    """I'll move this to app.py at some point. Easier to work on all my new classes in once place for now."""
     cmd_handler: CommandSetHandler
     interface_handler: InterfaceHandler
 
