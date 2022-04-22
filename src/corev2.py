@@ -1,0 +1,355 @@
+"""This module will be a refactored version of core. This version will be more generalized, and will encapsulate
+    all the state and functionality that makes of the core 'engine'.
+"""
+import csv
+import datetime
+import functools
+import random
+import settings
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from typing import Final, Sequence
+
+# Some constants to help write days for Date class in a more readable form
+
+
+MONDAY: Final = 0
+TUESDAY: Final = 1
+WEDNESDAY: Final = 2
+THURSDAY: Final = 3
+FRIDAY: Final = 4
+SATURDAY: Final = 5
+SUNDAY: Final = 6
+
+
+# Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
+class Date(datetime.date):
+    bleeds_list: list[str]
+    infused: bool
+    time_stamp: datetime.time | None
+
+    def __new__(cls, year, month, day):
+        return super().__new__(cls, year, month, day)
+
+    def __init__(self, year, month, day):
+        self.bleeds_list = []  # Holds strings representing an active bleeding episode
+        self.infused = False
+        self.time_stamp = None
+
+    # Hours -> 1-24, Where 1 = 1 AM and 24 = Midnight
+    def randomize_time_stamp(self, starting_hour: int, ending_hour: int) -> None:
+        if 1 <= (starting_hour and ending_hour) <= 24:
+            randomized_hour = random.randrange(starting_hour, (ending_hour + 1))
+            randomized_minute = random.randrange(1, 60)
+            self.time_stamp = datetime.time(hour=randomized_hour, minute=randomized_minute)
+        else:
+            raise ValueError('Hour should be 1->24')
+
+
+# A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
+class ScheduleHandler:
+    schedule = Iterable[int, int, int]
+
+    normal_prophey_schedule: schedule
+    alternative_prophey_schedule: schedule
+    current_schedule: schedule
+
+    def __init__(self, normal_schedule, alternate_schedule):
+        self.normal_schedule = normal_schedule
+        self.alternate_schedule = alternate_schedule
+        self.current_schedule = normal_schedule
+
+    def toggle(self) -> None:
+        if self.current_schedule == self.normal_schedule:
+            self.current_schedule = self.alternate_schedule
+        else:
+            self.current_schedule = self.normal_schedule
+
+    def reset(self) -> None:
+        self.current_schedule = self.normal_schedule
+
+
+@dataclass
+class Bepisode:
+    start_date: Date
+    location: str
+    duration: int
+    dates_active: list[Date] = field(default_factory=list)
+
+    def project_dates(self):
+        self.dates_active = generate_dates(self.start_date, self.duration)
+
+
+# Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
+# 21 days is always possible at the least, then depending on starting wkday max length is extended.
+# TODO: Figured out by hand, consider how I could have done this using math.
+# TODO: Use of magic #s are hindering testing. Only way to test current implementation is...more magic #s.
+# TODO: I'd only be testing that I haven't changed them, which is to say they don't test anything.
+# TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
+# TODO: Bepisodes would continue to be created within this new smaller window as well.
+# TODO: Also, what happens when I pass a decimal into this? Pretty sure it will raise a value error no matter what.
+def get_max_days(starting_weekday: int) -> int:
+    """Used by beps and for log generation"""
+    maximum_possible_days = 21
+    # Mon or Wed
+    if starting_weekday in [MONDAY, WEDNESDAY]:
+        maximum_possible_days += 2
+    # Sun, Tue, or Fri
+    elif starting_weekday in [SUNDAY, TUESDAY, FRIDAY]:
+        maximum_possible_days += 3
+    # Sat or Thr
+    elif starting_weekday in [THURSDAY, SATURDAY]:
+        maximum_possible_days += 4
+    else:
+        raise ValueError('Weekday was out of range while calculating max possible days.')
+    return maximum_possible_days
+
+
+"""
+    ==========================
+    logger shits
+    ==========================
+"""
+
+# Creates and returns a list of Date objects within a range based on input.
+def generate_dates(starting_date: Date, days_added: int) -> list:
+    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
+    return blank_log
+
+
+# TODO: This is on the list for a refactor. Test later.
+# Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
+# If one is found, the Date object will have its bleed list updated with a string.
+# The string represents the location of the aforementioned bleed.
+def couple_bleeds_to_dates(bepisodes_list: list, log: list) -> list:
+    for bepisode in bepisodes_list:
+        for date in bepisode.dates_active:
+            try:
+                date_to_tag_index = log.index(date)
+                date_to_tag = log[date_to_tag_index]
+                date_to_tag.bleeds_list.append(bepisode.location)
+            except ValueError:
+                print('Bleed projected passed end of window, probably.')
+    return log
+
+
+# TODO: Magic #
+# Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
+# Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
+# A new list will be created with Date objects that meet certain criteria.
+# Criterion includes: Was infused, had corresponding Bepisode, or both.
+def add_infusions_to_log(blank_log: list, settings_handler: settings.SettingsHandler) -> list:
+    doses_on_hand = 12
+    infusion_log = []
+    normal_prophey_schedule = settings_handler.schedules['normal']
+    alternative_prophey_schedule = settings_handler.schedules['alternate']
+    scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
+
+    # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
+    def infuse(toggle: bool = False) -> int:
+        nonlocal doses_on_hand
+        date.infused = True
+        doses_on_hand -= 1
+        date.randomize_time_stamp(settings_handler.time_stamp_range['min'], settings_handler.time_stamp_range['max'])
+        if toggle:
+            scheduler.toggle()
+        return doses_on_hand
+
+    for date in blank_log:
+        if doses_on_hand > 1:
+            if date.bleeds_list:
+                infusion_log.append(date)
+                yesterday_index = blank_log.index(date) - 1
+                day_before_yesterday_index = blank_log.index(date) - 2
+                if yesterday_index >= 0 and day_before_yesterday_index >= 0:
+                    if blank_log[yesterday_index].infused and blank_log[day_before_yesterday_index].infused:
+                        if date.weekday() == 6:
+                            scheduler.toggle()
+                        continue
+                    if date.weekday() not in scheduler.current_schedule:
+                        doses_on_hand = infuse(toggle=True)
+                    else:
+                        doses_on_hand = infuse()
+                else:
+                    if date.weekday() not in scheduler.current_schedule:
+                        doses_on_hand = infuse(toggle=True)
+                    else:
+                        doses_on_hand = infuse()
+            elif date.weekday() in scheduler.current_schedule:
+                infusion_log.append(date)
+                doses_on_hand = infuse()
+            else:
+                if date.weekday() == 6:
+                    scheduler.reset()
+        else:
+            break
+
+    return infusion_log
+# Used to visualize final log output, without having to check csv(or later DB)
+def print_log(log: list) -> None:
+    for date in log:
+        if date.bleeds_list:
+            print(f'{date} - {date.infused} - {date.bleeds_list}')
+        else:
+            print(f'{date} - {date.infused} - Prophey')
+
+
+# TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
+# Creates a string title for csv files based on first and last item in a list of Date objects.
+def make_csv_title(log: list) -> str:
+    starting_date, ending_date = log[0].strftime('%m-%d-%Y'), log[-1].strftime('%m-%d-%Y')
+    csv_title = f'{starting_date} - {ending_date}'
+    return csv_title
+
+
+# Used to output log to csv
+def output_log_to_csv(log: list) -> None:
+    csv_title = make_csv_title(log)
+    with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
+        log_writer = csv.writer(csv_log)
+        log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
+        for date in log:
+            if date.bleeds_list:
+                if date.infused:
+                    log_writer.writerow([date, 'Yes', date.time_stamp, date.bleeds_list])
+                else:
+                    log_writer.writerow([date, 'No', 'N/A', date.bleeds_list])
+            else:
+                log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
+
+"""
+    ====================
+    Bepisode shits
+    ====================
+"""
+
+
+# Randomizes a Date object within a given range of dates.
+def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) -> Date:
+    days_added = random.randrange(1, maximum_days_added)
+    bleed_start_date = starting_date + datetime.timedelta(days_added)
+    return bleed_start_date
+
+
+# Chooses and returns a random string from bleed locations list
+def randomize_bleed_location(locations: Sequence) -> str:
+    return random.choice(locations)
+    # bleed_location_index = random.randrange(len(bleed_locations))
+    # bleed_location = bleed_locations[bleed_location_index]
+    # return bleed_location
+
+
+def randomize_bleed_duration(minimum_duration: int, maximum_duration: int) -> int:
+    return random.randint(minimum_duration, maximum_duration)
+
+
+def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int, minimum_duration: int,
+                            maximum_duration: int, locations: Sequence) -> Bepisode:
+    bleed_start_date = randomize_bleed_episode_start(starting_date, maximum_possible_days)
+    location = randomize_bleed_location(locations)
+    duration = randomize_bleed_duration(minimum_duration, maximum_duration)
+    return Bepisode(bleed_start_date, location, duration)
+
+
+# Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
+# The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
+# TODO: Consider using a closure on randomize_bleed_episode to avoid passing so many args.
+#  2 of 3 args arent used by parent func. Also this function ALWAYS expects a bep list.
+#  Maybe it should create an empty one if no list is passed? Also this modifies the original list...not sure if matters.
+def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days_added: int,
+                       bepisode_list: list, minimum_duration: int, maximum_duration: int, locations: Sequence) -> list:
+    while len(bepisode_list) < number_of_bleeds_set:
+        bepisode = randomize_bleed_episode(starting_date, maximum_possible_days_added, minimum_duration,
+                                           maximum_duration, locations)
+        bepisode_list.append(bepisode)
+
+    for bepisode in bepisode_list:
+        print(f'{bepisode.duration} - {bepisode.location}')  # Used to display bleeds that were active. Remove later
+        bepisode.project_dates()
+        # bepisode.dates_active = generate_dates(bepisode.start_date, bepisode.duration)
+
+    return bepisode_list
+
+
+"""
+    ==========================
+    Input shits
+    ==========================
+"""
+
+
+def _get_valid_date_input(minimum, maximum, unit):
+    while True:
+        answer = input(f'Enter {unit}: ')
+
+        if answer.isdecimal():
+            answer = int(answer)
+        else:
+            print('That is not a number!')
+            continue
+
+        if answer in range(minimum, maximum + 1):
+            return answer
+        else:
+            print(f'{unit} out of range! Enter an integer in range {minimum} - {maximum}')
+            continue
+
+
+get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day,
+                                        maximum=datetime.date.max.day, unit='Day')
+get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month,
+                                          maximum=datetime.date.max.month, unit='Month')
+get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.year,
+                                         maximum=datetime.date.max.year, unit='Year')
+
+
+def get_date_input():
+    year = get_valid_year_input()
+    month = get_valid_month_input()
+    day = get_valid_day_input()
+    return year, month, day
+    # return Date(year, month, day)
+
+
+# Resulting list will be fed into randomize_all_bleed_episodes function at some point. Keep them compatible.
+def get_manual_bleeds() -> list:
+    manual_bepisodes = []
+    while True:
+        answer = input('Add Manual Bepisode? ')
+        if answer.capitalize() == 'Y':
+            year, month, day = get_date_input()
+            starting_date = Date(year, month, day)
+            location = input('Enter Bleed location ')
+            duration = int(input('Enter Numerical Duration '))
+            bepisode = Bepisode(starting_date, location, duration)
+            manual_bepisodes.append(bepisode)
+        else:
+            break
+    return manual_bepisodes
+
+
+"""
+    ====================
+    doing too fucking much
+    ====================
+"""
+
+
+# Creates a blank log based on user inputted start date/last shipment.
+# Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
+# Returns a list of Date objects that is ready for sifting.
+# Pretty much everything outside of creating a csv.
+def generate_log(settings_handler, starting_date, manual_bepisodes) -> list:
+    # starting_date, manual_bepisodes = get_all_inputs()
+    max_possible_days = get_max_days(starting_date.weekday())
+
+    bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days,
+                                       manual_bepisodes, settings_handler.bleed_duration_range['min'],
+                                       settings_handler.bleed_duration_range['max'], settings_handler.bleed_locations)
+
+    blank_log = generate_dates(starting_date, max_possible_days)
+
+    log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
+    full_log = add_infusions_to_log(log_with_bleeds, settings_handler)
+
+    return full_log
