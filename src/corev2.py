@@ -69,17 +69,6 @@ class ScheduleHandler:
         self.current_schedule = self.normal_schedule
 
 
-@dataclass
-class Bepisode:
-    start_date: Date
-    location: str
-    duration: int
-    dates_active: list[Date] = field(default_factory=list)
-
-    def project_dates(self):
-        self.dates_active = generate_dates(self.start_date, self.duration)
-
-
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # TODO: Figured out by hand, consider how I could have done this using math.
@@ -110,6 +99,7 @@ def get_max_days(starting_weekday: int) -> int:
     logger shits
     ==========================
 """
+
 
 # Creates and returns a list of Date objects within a range based on input.
 def generate_dates(starting_date: Date, days_added: int) -> list:
@@ -185,6 +175,8 @@ def add_infusions_to_log(blank_log: list, settings_handler: settings.SettingsHan
             break
 
     return infusion_log
+
+
 # Used to visualize final log output, without having to check csv(or later DB)
 def print_log(log: list) -> None:
     for date in log:
@@ -217,11 +209,23 @@ def output_log_to_csv(log: list) -> None:
             else:
                 log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
 
+
 """
     ====================
     Bepisode shits
     ====================
 """
+
+
+@dataclass
+class Bepisode:
+    start_date: Date
+    location: str
+    duration: int
+    dates_active: list[Date] = field(default_factory=list)
+
+    def project_dates(self):
+        self.dates_active = generate_dates(self.start_date, self.duration)
 
 
 # Randomizes a Date object within a given range of dates.
