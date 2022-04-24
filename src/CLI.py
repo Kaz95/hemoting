@@ -74,7 +74,7 @@ class CommandSet(base_classes.CommandSet):
     def list_commands(self):
         pprint.pprint(self.command_info_registry)
 
-    def bind_core_to_receivers(self):
+    def _bind_core_to_receivers(self):
         return Receivers(self.core)
 
 

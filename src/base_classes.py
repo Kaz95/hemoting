@@ -59,7 +59,7 @@ class CommandSet(ABC):
 
     def __init__(self, core_engine):
         self.core_engine = core_engine
-        self.receivers = self.bind_core_to_receivers()
+        self.receivers = self._bind_core_to_receivers()
         self.command_info_registry = {}
         self._register_commands()
 
@@ -80,7 +80,7 @@ class CommandSet(ABC):
         pass
 
     @abstractmethod
-    def bind_core_to_receivers(self):
+    def _bind_core_to_receivers(self):
         pass
 
 
@@ -130,7 +130,7 @@ class CommandSetHandler:
     def ls(self, args=None):
         match args:
             case [user_cmd_argument]:
-                self.ls_command_info(user_cmd_argument)
+                self._ls_command_info(user_cmd_argument)
             case None:
                 self.command_set.list_commands()
             case _:
@@ -141,7 +141,7 @@ class CommandSetHandler:
         # else:
         #     self.command_set.list_commands()
 
-    def ls_command_info(self, cmd):
+    def _ls_command_info(self, cmd):
         cmd_info = self.command_set.command_info_registry[cmd]
         print(f'Command: {cmd}')
         print(f'Description: {cmd_info.description}')
