@@ -5,18 +5,21 @@ from collections.abc import Callable
 
 class Interface(base_classes.Interface):
     def run(self):
-        pass
+        raise NotImplementedError('Soon™')
 
 
 class CommandSet(base_classes.CommandSet):
     def get_receiver_info(self, cmd):
-        pass
+        raise NotImplementedError('Soon™')
 
     def register_command(self, receiver: Callable, description: str, aliases: list[str]):
-        pass
+        raise NotImplementedError('Soon™')
 
     def _register_commands(self):
-        pass
+        raise NotImplementedError('Soon™')
 
     def list_commands(self):
-        pass
+        raise NotImplementedError('Soon™')
+
+    def bind_core_to_receivers(self):
+        raise NotImplementedError('Soon™')
