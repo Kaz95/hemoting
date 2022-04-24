@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 import base_classes
 import core
+import corev2
 import settings
 
 
@@ -21,6 +22,25 @@ def _serialize_date_input(u_input: str):
 
 
 def run(args=None):
+    match args:
+        case [user_date_input]:
+            starting_date = _serialize_date_input(user_date_input)
+        case _:
+            starting_date = core.Date(2022, 2, 2)
+
+    # if args:
+    #     starting_date = _serialize_date_input(args[0])
+    # else:
+    #     starting_date = core.Date(2022, 2, 2)
+
+    setting_handler = settings.initialize_settings()
+    manual_bepisodes = []
+    log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
+    core.print_log(log)
+    core.output_log_to_csv(log)
+
+
+def runv2(args=None):
     match args:
         case [user_date_input]:
             starting_date = _serialize_date_input(user_date_input)

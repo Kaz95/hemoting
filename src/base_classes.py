@@ -5,6 +5,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 import os
 
+from src import corev2
+
 
 @dataclass
 class Command:
@@ -130,6 +132,34 @@ class InterfaceHandler:
         self.interface.run()
 
 
+class Receivers(ABC):
+
+    core_engine: corev2.CoreEngine
+
+    def __init__(self, core_engine):
+        self.core_engine = core_engine
+
+    @abstractmethod
+    def run(self):
+        pass
+
+    @abstractmethod
+    def update_setting(self):
+        pass
+
+    @abstractmethod
+    def reset_settings(self):
+        pass
+
+    @abstractmethod
+    def add_bepisode(self):
+        pass
+
+    @abstractmethod
+    def remove_bepisode(self):
+        pass
+
+
 # This could easily be a 'main' function. A class allows for namespacing, holding state(settings), and the coupling
 # of logic to the aforementioned state. Consider if this is the best solution later. Right now main is acting as app.
 class App:
@@ -151,3 +181,7 @@ class App:
 
     def run(self):
         self.interface_handler.run()
+
+
+if __name__ == '__main__':
+    App.clean_up()

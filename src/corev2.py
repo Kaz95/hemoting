@@ -48,16 +48,17 @@ class Date(datetime.date):
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
 class ScheduleHandler:
-    schedule = Iterable[int, int, int]
+    # schedule = Iterable[int, int, int]
+    #
+    # normal_prophey_schedule: schedule
+    # alternative_prophey_schedule: schedule
+    # current_schedule: schedule
 
-    normal_prophey_schedule: schedule
-    alternative_prophey_schedule: schedule
-    current_schedule: schedule
-
-    def __init__(self, normal_schedule, alternate_schedule):
-        self.normal_schedule = normal_schedule
-        self.alternate_schedule = alternate_schedule
-        self.current_schedule = normal_schedule
+    def __init__(self, settings_handler):
+        self.settings_handler = settings_handler
+        self.normal_schedule = self.settings_handler.schedules['normal']
+        self.alternate_schedule = self.settings_handler.schedules['alternate']
+        self.current_schedule = self.normal_schedule
 
     def toggle(self) -> None:
         if self.current_schedule == self.normal_schedule:
@@ -95,122 +96,6 @@ def get_max_days(starting_weekday: int) -> int:
 
 
 """
-    ==========================
-    logger shits
-    ==========================
-"""
-
-
-# Creates and returns a list of Date objects within a range based on input.
-def generate_dates(starting_date: Date, days_added: int) -> list:
-    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
-    return blank_log
-
-
-# TODO: This is on the list for a refactor. Test later.
-# Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
-# If one is found, the Date object will have its bleed list updated with a string.
-# The string represents the location of the aforementioned bleed.
-def couple_bleeds_to_dates(bepisodes_list: list, log: list) -> list:
-    for bepisode in bepisodes_list:
-        for date in bepisode.dates_active:
-            try:
-                date_to_tag_index = log.index(date)
-                date_to_tag = log[date_to_tag_index]
-                date_to_tag.bleeds_list.append(bepisode.location)
-            except ValueError:
-                print('Bleed projected passed end of window, probably.')
-    return log
-
-
-# TODO: Magic #
-# Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
-# Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
-# A new list will be created with Date objects that meet certain criteria.
-# Criterion includes: Was infused, had corresponding Bepisode, or both.
-def add_infusions_to_log(blank_log: list, settings_handler: settings.SettingsHandler) -> list:
-    doses_on_hand = 12
-    infusion_log = []
-    normal_prophey_schedule = settings_handler.schedules['normal']
-    alternative_prophey_schedule = settings_handler.schedules['alternate']
-    scheduler = ScheduleHandler(normal_prophey_schedule, alternative_prophey_schedule)
-
-    # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
-    def infuse(toggle: bool = False) -> int:
-        nonlocal doses_on_hand
-        date.infused = True
-        doses_on_hand -= 1
-        date.randomize_time_stamp(settings_handler.time_stamp_range['min'], settings_handler.time_stamp_range['max'])
-        if toggle:
-            scheduler.toggle()
-        return doses_on_hand
-
-    for date in blank_log:
-        if doses_on_hand > 1:
-            if date.bleeds_list:
-                infusion_log.append(date)
-                yesterday_index = blank_log.index(date) - 1
-                day_before_yesterday_index = blank_log.index(date) - 2
-                if yesterday_index >= 0 and day_before_yesterday_index >= 0:
-                    if blank_log[yesterday_index].infused and blank_log[day_before_yesterday_index].infused:
-                        if date.weekday() == 6:
-                            scheduler.toggle()
-                        continue
-                    if date.weekday() not in scheduler.current_schedule:
-                        doses_on_hand = infuse(toggle=True)
-                    else:
-                        doses_on_hand = infuse()
-                else:
-                    if date.weekday() not in scheduler.current_schedule:
-                        doses_on_hand = infuse(toggle=True)
-                    else:
-                        doses_on_hand = infuse()
-            elif date.weekday() in scheduler.current_schedule:
-                infusion_log.append(date)
-                doses_on_hand = infuse()
-            else:
-                if date.weekday() == 6:
-                    scheduler.reset()
-        else:
-            break
-
-    return infusion_log
-
-
-# Used to visualize final log output, without having to check csv(or later DB)
-def print_log(log: list) -> None:
-    for date in log:
-        if date.bleeds_list:
-            print(f'{date} - {date.infused} - {date.bleeds_list}')
-        else:
-            print(f'{date} - {date.infused} - Prophey')
-
-
-# TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
-# Creates a string title for csv files based on first and last item in a list of Date objects.
-def make_csv_title(log: list) -> str:
-    starting_date, ending_date = log[0].strftime('%m-%d-%Y'), log[-1].strftime('%m-%d-%Y')
-    csv_title = f'{starting_date} - {ending_date}'
-    return csv_title
-
-
-# Used to output log to csv
-def output_log_to_csv(log: list) -> None:
-    csv_title = make_csv_title(log)
-    with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
-        log_writer = csv.writer(csv_log)
-        log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
-        for date in log:
-            if date.bleeds_list:
-                if date.infused:
-                    log_writer.writerow([date, 'Yes', date.time_stamp, date.bleeds_list])
-                else:
-                    log_writer.writerow([date, 'No', 'N/A', date.bleeds_list])
-            else:
-                log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
-
-
-"""
     ====================
     Bepisode shits
     ====================
@@ -228,51 +113,212 @@ class Bepisode:
         self.dates_active = generate_dates(self.start_date, self.duration)
 
 
-# Randomizes a Date object within a given range of dates.
-def randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) -> Date:
-    days_added = random.randrange(1, maximum_days_added)
-    bleed_start_date = starting_date + datetime.timedelta(days_added)
-    return bleed_start_date
+class BepisodeHandler:
+    bepisodes: list[Bepisode]
+    settings_handler: settings.SettingsHandler
+
+    def __init__(self, settings_handler):
+        self.bepisodes = []
+        self.settings_handler = settings_handler
+
+    # Randomizes a Date object within a given range of dates.
+    @staticmethod
+    def _randomize_bleed_episode_start(starting_date: Date, maximum_days_added: int) -> Date:
+        days_added = random.randrange(1, maximum_days_added)
+        bleed_start_date = starting_date + datetime.timedelta(days_added)
+        return bleed_start_date
+
+    # Chooses and returns a random string from bleed locations list
+    def _randomize_bleed_location(self) -> str:
+        return random.choice(self.settings_handler.bleed_locations)
+
+    def _randomize_bleed_duration(self) -> int:
+        return random.randint(self.settings_handler.bleed_duration_range['min'],
+                              self.settings_handler.bleed_duration_range['max'])
+
+    def randomize_bleed_episode(self, starting_date: Date, maximum_possible_days: int) -> None:
+        bleed_start_date = self._randomize_bleed_episode_start(starting_date, maximum_possible_days)
+        location = self._randomize_bleed_location()
+        duration = self._randomize_bleed_duration()
+        randomized_bepisode = Bepisode(bleed_start_date, location, duration)
+        self.bepisodes.append(randomized_bepisode)
+
+    # Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
+    # The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
+    # TODO: Consider using a closure on randomize_bleed_episode to avoid passing so many args.
+    #  2 of 3 args arent used by parent func. Also this function ALWAYS expects a bep list.
+    #  Maybe it should create an empty one if no list is passed?
+    #  Also this modifies the original list not sure if matters.
+    def fill_bepisode_list(self, starting_date: Date, maximum_possible_days_added: int) -> None:
+        while len(self.bepisodes) < self.settings_handler.number_of_bleeds:
+            self.randomize_bleed_episode(starting_date, maximum_possible_days_added)
+
+        for bepisode in self.bepisodes:
+            print(f'{bepisode.duration} - {bepisode.location}')  # Used to display bleeds that were active. Remove later
+            bepisode.project_dates()
+
+    # TODO: This should be tied to CLI not core.
+    # # Resulting list will be fed into randomize_all_bleed_episodes function at some point. Keep them compatible.
+    # def get_manual_bleeds(self) -> None:
+    #     while True:
+    #         answer = input('Add Manual Bepisode? ')
+    #         if answer.capitalize() == 'Y':
+    #             year, month, day = get_date_input()
+    #             starting_date = Date(year, month, day)
+    #             location = input('Enter Bleed location ')
+    #             duration = int(input('Enter Numerical Duration '))
+    #             bepisode = Bepisode(starting_date, location, duration)
+    #             self.manual_bleeds.append(bepisode)
+    #         else:
+    #             break
 
 
-# Chooses and returns a random string from bleed locations list
-def randomize_bleed_location(locations: Sequence) -> str:
-    return random.choice(locations)
-    # bleed_location_index = random.randrange(len(bleed_locations))
-    # bleed_location = bleed_locations[bleed_location_index]
-    # return bleed_location
+"""
+    ==========================
+    logger shits
+    ==========================
+"""
 
 
-def randomize_bleed_duration(minimum_duration: int, maximum_duration: int) -> int:
-    return random.randint(minimum_duration, maximum_duration)
+# Creates and returns a list of Date objects within a range based on input.
+def generate_dates(starting_date: Date, days_added: int) -> list:
+    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
+    return blank_log
 
 
-def randomize_bleed_episode(starting_date: Date, maximum_possible_days: int, minimum_duration: int,
-                            maximum_duration: int, locations: Sequence) -> Bepisode:
-    bleed_start_date = randomize_bleed_episode_start(starting_date, maximum_possible_days)
-    location = randomize_bleed_location(locations)
-    duration = randomize_bleed_duration(minimum_duration, maximum_duration)
-    return Bepisode(bleed_start_date, location, duration)
+class Logger:
+    log: list[Date] | None
+    schedule_handler: ScheduleHandler
+    settings_handler: settings.SettingsHandler
+    bepisodes_handler: BepisodeHandler
+    bepisodes: list[Bepisode]
+    starting_date: Date
+    max_possible_days: int
 
+    def __init__(self, settings_handler, bepisode_handler, schedule_handler):
+        self.schedule_handler = schedule_handler
+        self.settings_handler = settings_handler
+        self.bepisodes_handler = bepisode_handler
+        self.bepisodes = self.bepisodes_handler.bepisodes
 
-# Accepts an amount of bleeds, and will randomize and add bleeds until the list is 'filled' to that amount.
-# The list may or may not be empty when passed in. This allows program to back-fill any non-manual bleeds.
-# TODO: Consider using a closure on randomize_bleed_episode to avoid passing so many args.
-#  2 of 3 args arent used by parent func. Also this function ALWAYS expects a bep list.
-#  Maybe it should create an empty one if no list is passed? Also this modifies the original list...not sure if matters.
-def fill_bepisode_list(number_of_bleeds_set: int, starting_date: Date, maximum_possible_days_added: int,
-                       bepisode_list: list, minimum_duration: int, maximum_duration: int, locations: Sequence) -> list:
-    while len(bepisode_list) < number_of_bleeds_set:
-        bepisode = randomize_bleed_episode(starting_date, maximum_possible_days_added, minimum_duration,
-                                           maximum_duration, locations)
-        bepisode_list.append(bepisode)
+        self.starting_date = Date(2022, 2, 2)
+        self.max_possible_days = get_max_days(self.starting_date.weekday())
 
-    for bepisode in bepisode_list:
-        print(f'{bepisode.duration} - {bepisode.location}')  # Used to display bleeds that were active. Remove later
-        bepisode.project_dates()
-        # bepisode.dates_active = generate_dates(bepisode.start_date, bepisode.duration)
+        self.log = None
 
-    return bepisode_list
+    def update_starting_date(self, new_date: Date) -> None:
+        self.starting_date = new_date
+        self.max_possible_days = get_max_days(self.starting_date.weekday())
+
+    def create_blank_log(self) -> None:
+        blank_log = generate_dates(self.starting_date, self.max_possible_days)
+        self.log = blank_log
+
+    # TODO: This is on the list for a refactor. Test later.
+    # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
+    # If one is found, the Date object will have its bleed list updated with a string.
+    # The string represents the location of the aforementioned bleed.
+    def couple_bleeds_to_dates(self) -> None:
+        for bepisode in self.bepisodes:
+            for date in bepisode.dates_active:
+                try:
+                    date_to_tag_index = self.log.index(date)
+                    date_to_tag = self.log[date_to_tag_index]
+                    date_to_tag.bleeds_list.append(bepisode.location)
+                except ValueError:
+                    print('Bleed projected passed end of window, probably.')
+
+    # TODO: Magic #
+    # Meat and potatoes function. Handles most of the logic to create an infusion log. Accepts an 'empty log' as input.
+    # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
+    # A new list will be created with Date objects that meet certain criteria.
+    # Criterion includes: Was infused, had corresponding Bepisode, or both.
+    def add_infusions_to_log(self) -> None:
+        doses_on_hand = 12
+        infusion_log = []
+        scheduler = self.schedule_handler
+
+        # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
+        def infuse(toggle: bool = False) -> int:
+            nonlocal doses_on_hand
+            date.infused = True
+            doses_on_hand -= 1
+            date.randomize_time_stamp(self.settings_handler.time_stamp_range['min'],
+                                      self.settings_handler.time_stamp_range['max'])
+            if toggle:
+                scheduler.toggle()
+            return doses_on_hand
+
+        for date in self.log:
+            if doses_on_hand > 1:
+                if date.bleeds_list:
+                    infusion_log.append(date)
+                    yesterday_index = self.log.index(date) - 1
+                    day_before_yesterday_index = self.log.index(date) - 2
+                    if yesterday_index >= 0 and day_before_yesterday_index >= 0:
+                        if self.log[yesterday_index].infused and self.log[day_before_yesterday_index].infused:
+                            if date.weekday() == 6:
+                                scheduler.toggle()
+                            continue
+                        if date.weekday() not in scheduler.current_schedule:
+                            doses_on_hand = infuse(toggle=True)
+                        else:
+                            doses_on_hand = infuse()
+                    else:
+                        if date.weekday() not in scheduler.current_schedule:
+                            doses_on_hand = infuse(toggle=True)
+                        else:
+                            doses_on_hand = infuse()
+                elif date.weekday() in scheduler.current_schedule:
+                    infusion_log.append(date)
+                    doses_on_hand = infuse()
+                else:
+                    if date.weekday() == 6:
+                        scheduler.reset()
+            else:
+                break
+
+        self.log = infusion_log
+
+    # Used to visualize final log output, without having to check csv(or later DB)
+    def print_log(self) -> None:
+        for date in self.log:
+            if date.bleeds_list:
+                print(f'{date} - {date.infused} - {date.bleeds_list}')
+            else:
+                print(f'{date} - {date.infused} - Prophey')
+
+    # TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
+    # Creates a string title for csv files based on first and last item in a list of Date objects.
+    def make_csv_title(self) -> str:
+        starting_date, ending_date = self.log[0].strftime('%m-%d-%Y'), self.log[-1].strftime('%m-%d-%Y')
+        csv_title = f'{starting_date} - {ending_date}'
+        return csv_title
+
+    # Used to output log to csv
+    def output_log_to_csv(self) -> None:
+        csv_title = self.make_csv_title()
+        with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
+            log_writer = csv.writer(csv_log)
+            log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
+            for date in self.log:
+                if date.bleeds_list:
+                    if date.infused:
+                        log_writer.writerow([date, 'Yes', date.time_stamp, date.bleeds_list])
+                    else:
+                        log_writer.writerow([date, 'No', 'N/A', date.bleeds_list])
+                else:
+                    log_writer.writerow([date, 'Yes', date.time_stamp, 'Prophylaxis'])
+
+    # Creates a blank log based on user inputted start date/last shipment.
+    # Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
+    # Returns a list of Date objects that is ready for sifting.
+    # Pretty much everything outside of creating a csv.
+    def generate_log(self) -> None:
+        self.bepisodes_handler.fill_bepisode_list(self.starting_date, self.max_possible_days)
+        self.create_blank_log()
+        self.couple_bleeds_to_dates()
+        self.add_infusions_to_log()
 
 
 """
@@ -315,45 +361,32 @@ def get_date_input():
     # return Date(year, month, day)
 
 
-# Resulting list will be fed into randomize_all_bleed_episodes function at some point. Keep them compatible.
-def get_manual_bleeds() -> list:
-    manual_bepisodes = []
-    while True:
-        answer = input('Add Manual Bepisode? ')
-        if answer.capitalize() == 'Y':
-            year, month, day = get_date_input()
-            starting_date = Date(year, month, day)
-            location = input('Enter Bleed location ')
-            duration = int(input('Enter Numerical Duration '))
-            bepisode = Bepisode(starting_date, location, duration)
-            manual_bepisodes.append(bepisode)
-        else:
-            break
-    return manual_bepisodes
+class CoreEngine:
+    settings_handler: settings.SettingsHandler
+    bepiode_handler: BepisodeHandler
+    schedule_handler: ScheduleHandler
+    logger: Logger
+
+    def __init__(self):
+        self.settings_handler = settings.SettingsHandler.initialize_settings()
+        self.bepiode_handler = BepisodeHandler(self.settings_handler)
+        self.schedule_handler = ScheduleHandler(self.settings_handler)
+        self.logger = Logger(self.settings_handler, self.bepiode_handler, self.schedule_handler)
 
 
-"""
-    ====================
-    doing too fucking much
-    ====================
-"""
+if __name__ == '__main__':
+    ...
+    core = CoreEngine()
+    logger = core.logger
+    logger.generate_log()
+    logger.print_log()
+    logger.output_log_to_csv()
 
-
-# Creates a blank log based on user inputted start date/last shipment.
-# Fills that log with occurrences of bleeding and infusions based on user inputted manual bleeds.
-# Returns a list of Date objects that is ready for sifting.
-# Pretty much everything outside of creating a csv.
-def generate_log(settings_handler, starting_date, manual_bepisodes) -> list:
-    # starting_date, manual_bepisodes = get_all_inputs()
-    max_possible_days = get_max_days(starting_date.weekday())
-
-    bepisode_list = fill_bepisode_list(settings_handler.number_of_bleeds, starting_date, max_possible_days,
-                                       manual_bepisodes, settings_handler.bleed_duration_range['min'],
-                                       settings_handler.bleed_duration_range['max'], settings_handler.bleed_locations)
-
-    blank_log = generate_dates(starting_date, max_possible_days)
-
-    log_with_bleeds = couple_bleeds_to_dates(bepisode_list, blank_log)
-    full_log = add_infusions_to_log(log_with_bleeds, settings_handler)
-
-    return full_log
+    # setting_handler = settings.initialize_settings()
+    # bepi_handler = BepisodeHandler(setting_handler)
+    # # bepi_handler.get_manual_bepisodes() or some such shit here for manual beps.
+    # # Might even move filling of bepisodes out here too
+    # logger = Logger(bepisode_handler=bepi_handler, settings_handler=setting_handler, starting_date=Date(2022, 2, 2))
+    # logger.generate_log()
+    # logger.print_log()
+    # logger.output_log_to_csv()
