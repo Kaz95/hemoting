@@ -109,12 +109,6 @@ class Date(datetime.date):
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
 class ScheduleHandler:
-    # schedule = Iterable[int, int, int]
-    #
-    # normal_prophey_schedule: schedule
-    # alternative_prophey_schedule: schedule
-    # current_schedule: schedule
-
     def __init__(self, settings):
         self.settings = settings
         self.normal_schedule = self.settings.schedules['normal']
@@ -131,6 +125,9 @@ class ScheduleHandler:
         self.current_schedule = self.normal_schedule
 
 
+"""Used by beps and for log generation"""
+
+
 # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
 # 21 days is always possible at the least, then depending on starting wkday max length is extended.
 # TODO: Figured out by hand, consider how I could have done this using math.
@@ -139,8 +136,7 @@ class ScheduleHandler:
 # TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
 # TODO: Bepisodes would continue to be created within this new smaller window as well.
 # TODO: Also, what happens when I pass a decimal into this? Pretty sure it will raise a value error no matter what.
-def get_max_days(starting_weekday: int) -> int:
-    """Used by beps and for log generation"""
+def _get_max_days(starting_weekday: int) -> int:
     maximum_possible_days = 21
     # Mon or Wed
     if starting_weekday in [MONDAY, WEDNESDAY]:
@@ -154,6 +150,12 @@ def get_max_days(starting_weekday: int) -> int:
     else:
         raise ValueError('Weekday was out of range while calculating max possible days.')
     return maximum_possible_days
+
+
+# Creates and returns a list of Date objects within a range based on input.
+def _generate_dates(starting_date: Date, days_added: int) -> list:
+    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
+    return blank_log
 
 
 """
@@ -171,7 +173,7 @@ class Bepisode:
     dates_active: list[Date] = field(default_factory=list)
 
     def project_dates(self):
-        self.dates_active = generate_dates(self.start_date, self.duration)
+        self.dates_active = _generate_dates(self.start_date, self.duration)
 
 
 class BepisodeHandler:
@@ -197,7 +199,7 @@ class BepisodeHandler:
         return random.randint(self.settings.bleed_duration_range['min'],
                               self.settings.bleed_duration_range['max'])
 
-    def randomize_bleed_episode(self, starting_date: Date, maximum_possible_days: int) -> None:
+    def _randomize_bleed_episode(self, starting_date: Date, maximum_possible_days: int) -> None:
         bleed_start_date = self._randomize_bleed_episode_start(starting_date, maximum_possible_days)
         location = self._randomize_bleed_location()
         duration = self._randomize_bleed_duration()
@@ -212,7 +214,7 @@ class BepisodeHandler:
     #  Also this modifies the original list not sure if matters.
     def fill_bepisode_list(self, starting_date: Date, maximum_possible_days_added: int) -> None:
         while len(self.bepisodes) < self.settings.number_of_bleeds:
-            self.randomize_bleed_episode(starting_date, maximum_possible_days_added)
+            self._randomize_bleed_episode(starting_date, maximum_possible_days_added)
 
         for bepisode in self.bepisodes:
             print(f'{bepisode.duration} - {bepisode.location}')  # Used to display bleeds that were active. Remove later
@@ -241,12 +243,6 @@ class BepisodeHandler:
 """
 
 
-# Creates and returns a list of Date objects within a range based on input.
-def generate_dates(starting_date: Date, days_added: int) -> list:
-    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
-    return blank_log
-
-
 class Logger:
     log: list[Date] | None
     schedule_handler: ScheduleHandler
@@ -263,23 +259,23 @@ class Logger:
         self.bepisodes = self.bepisodes_handler.bepisodes
 
         self.starting_date = Date(2022, 2, 2)
-        self.max_possible_days = get_max_days(self.starting_date.weekday())
+        self.max_possible_days = _get_max_days(self.starting_date.weekday())
 
         self.log = None
 
     def update_starting_date(self, new_date: Date) -> None:
         self.starting_date = new_date
-        self.max_possible_days = get_max_days(self.starting_date.weekday())
+        self.max_possible_days = _get_max_days(self.starting_date.weekday())
 
-    def create_blank_log(self) -> None:
-        blank_log = generate_dates(self.starting_date, self.max_possible_days)
+    def _create_blank_log(self) -> None:
+        blank_log = _generate_dates(self.starting_date, self.max_possible_days)
         self.log = blank_log
 
     # TODO: This is on the list for a refactor. Test later.
     # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
     # If one is found, the Date object will have its bleed list updated with a string.
     # The string represents the location of the aforementioned bleed.
-    def couple_bleeds_to_dates(self) -> None:
+    def _couple_bleeds_to_dates(self) -> None:
         for bepisode in self.bepisodes:
             for date in bepisode.dates_active:
                 try:
@@ -294,13 +290,13 @@ class Logger:
     # Infusions will be programmatically applied to Date objects based on a pre defined algorithm, until doses are exhausted.
     # A new list will be created with Date objects that meet certain criteria.
     # Criterion includes: Was infused, had corresponding Bepisode, or both.
-    def add_infusions_to_log(self) -> None:
+    def _add_infusions_to_log(self) -> None:
         doses_on_hand = 12
         infusion_log = []
         scheduler = self.schedule_handler
 
         # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
-        def infuse(toggle: bool = False) -> int:
+        def _infuse(toggle: bool = False) -> int:
             nonlocal doses_on_hand
             date.infused = True
             doses_on_hand -= 1
@@ -322,17 +318,17 @@ class Logger:
                                 scheduler.toggle()
                             continue
                         if date.weekday() not in scheduler.current_schedule:
-                            doses_on_hand = infuse(toggle=True)
+                            doses_on_hand = _infuse(toggle=True)
                         else:
-                            doses_on_hand = infuse()
+                            doses_on_hand = _infuse()
                     else:
                         if date.weekday() not in scheduler.current_schedule:
-                            doses_on_hand = infuse(toggle=True)
+                            doses_on_hand = _infuse(toggle=True)
                         else:
-                            doses_on_hand = infuse()
+                            doses_on_hand = _infuse()
                 elif date.weekday() in scheduler.current_schedule:
                     infusion_log.append(date)
-                    doses_on_hand = infuse()
+                    doses_on_hand = _infuse()
                 else:
                     if date.weekday() == 6:
                         scheduler.reset()
@@ -351,14 +347,14 @@ class Logger:
 
     # TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
     # Creates a string title for csv files based on first and last item in a list of Date objects.
-    def make_csv_title(self) -> str:
+    def _make_csv_title(self) -> str:
         starting_date, ending_date = self.log[0].strftime('%m-%d-%Y'), self.log[-1].strftime('%m-%d-%Y')
         csv_title = f'{starting_date} - {ending_date}'
         return csv_title
 
     # Used to output log to csv
     def output_log_to_csv(self) -> None:
-        csv_title = self.make_csv_title()
+        csv_title = self._make_csv_title()
         with open(f'{csv_title}.csv', 'x', newline='') as csv_log:
             log_writer = csv.writer(csv_log)
             log_writer.writerow(['Date', 'Infused', 'time-stamp', 'Reason'])
@@ -377,9 +373,9 @@ class Logger:
     # Pretty much everything outside of creating a csv.
     def generate_log(self) -> None:
         self.bepisodes_handler.fill_bepisode_list(self.starting_date, self.max_possible_days)
-        self.create_blank_log()
-        self.couple_bleeds_to_dates()
-        self.add_infusions_to_log()
+        self._create_blank_log()
+        self._couple_bleeds_to_dates()
+        self._add_infusions_to_log()
 
 
 """
@@ -389,37 +385,37 @@ class Logger:
 """
 
 
-def _get_valid_date_input(minimum, maximum, unit):
-    while True:
-        answer = input(f'Enter {unit}: ')
-
-        if answer.isdecimal():
-            answer = int(answer)
-        else:
-            print('That is not a number!')
-            continue
-
-        if answer in range(minimum, maximum + 1):
-            return answer
-        else:
-            print(f'{unit} out of range! Enter an integer in range {minimum} - {maximum}')
-            continue
-
-
-get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day,
-                                        maximum=datetime.date.max.day, unit='Day')
-get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month,
-                                          maximum=datetime.date.max.month, unit='Month')
-get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.year,
-                                         maximum=datetime.date.max.year, unit='Year')
+# def _get_valid_date_input(minimum, maximum, unit):
+#     while True:
+#         answer = input(f'Enter {unit}: ')
+#
+#         if answer.isdecimal():
+#             answer = int(answer)
+#         else:
+#             print('That is not a number!')
+#             continue
+#
+#         if answer in range(minimum, maximum + 1):
+#             return answer
+#         else:
+#             print(f'{unit} out of range! Enter an integer in range {minimum} - {maximum}')
+#             continue
 
 
-def get_date_input():
-    year = get_valid_year_input()
-    month = get_valid_month_input()
-    day = get_valid_day_input()
-    return year, month, day
-    # return Date(year, month, day)
+# get_valid_day_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.day,
+#                                         maximum=datetime.date.max.day, unit='Day')
+# get_valid_month_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.month,
+#                                           maximum=datetime.date.max.month, unit='Month')
+# get_valid_year_input = functools.partial(_get_valid_date_input, minimum=datetime.date.min.year,
+#                                          maximum=datetime.date.max.year, unit='Year')
+
+
+# def get_date_input():
+#     year = get_valid_year_input()
+#     month = get_valid_month_input()
+#     day = get_valid_day_input()
+#     return year, month, day
+#     # return Date(year, month, day)
 
 
 class CoreEngine:
