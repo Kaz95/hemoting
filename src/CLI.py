@@ -44,16 +44,16 @@ class Receivers(base_classes.Receivers):
         self.core_engine.logger.output_log_to_csv()
 
     def update_setting(self):
-        pass
+        raise NotImplementedError('Soon™')
 
     def reset_settings(self):
-        pass
+        raise NotImplementedError('Soon™')
 
     def add_bepisode(self):
-        pass
+        raise NotImplementedError('Soon™')
 
     def remove_bepisode(self):
-        pass
+        raise NotImplementedError('Soon™')
 
 
 class CommandSet(base_classes.CommandSet):
@@ -89,3 +89,5 @@ class Interface(base_classes.Interface):
                     break
                 case _:
                     self.command_handler.handle_command(user_input)
+
+
