@@ -4,8 +4,6 @@ from collections.abc import Callable
 
 import base_classes
 import core
-import corev2
-import settings
 
 
 # A few test receiver functions. Receivers being a function that encapsulates all the logic needed to carry out
@@ -21,42 +19,41 @@ def _serialize_date_input(u_input: str):
             return starting_date
 
 
-def run(args=None):
-    match args:
-        case [user_date_input]:
-            starting_date = _serialize_date_input(user_date_input)
-        case _:
-            starting_date = core.Date(2022, 2, 2)
-
-    # if args:
-    #     starting_date = _serialize_date_input(args[0])
-    # else:
-    #     starting_date = core.Date(2022, 2, 2)
-
-    setting_handler = settings.initialize_settings()
-    manual_bepisodes = []
-    log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
-    core.print_log(log)
-    core.output_log_to_csv(log)
+def _print_log(log: list[core.Date]) -> None:
+    for date in log:
+        if date.bleeds_list:
+            print(f'{date} - {date.infused} - {date.bleeds_list}')
+        else:
+            print(f'{date} - {date.infused} - Prophey')
 
 
-def runv2(args=None):
-    match args:
-        case [user_date_input]:
-            starting_date = _serialize_date_input(user_date_input)
-        case _:
-            starting_date = core.Date(2022, 2, 2)
+class Receivers(base_classes.Receivers):
 
-    # if args:
-    #     starting_date = _serialize_date_input(args[0])
-    # else:
-    #     starting_date = core.Date(2022, 2, 2)
+    def run(self, args=None):
+        match args:
+            case [user_date_input]:
+                starting_date = _serialize_date_input(user_date_input)
+            case _:
+                starting_date = core.Date(2022, 2, 2)
 
-    setting_handler = settings.initialize_settings()
-    manual_bepisodes = []
-    log = core.generate_log(setting_handler, starting_date, manual_bepisodes)
-    core.print_log(log)
-    core.output_log_to_csv(log)
+        self.core_engine.logger.starting_date = starting_date
+        self.core_engine.logger.generate_log()
+
+        _print_log(self.core_engine.logger.log)
+        # self.core_engine.logger.print_log()
+        self.core_engine.logger.output_log_to_csv()
+
+    def update_setting(self):
+        pass
+
+    def reset_settings(self):
+        pass
+
+    def add_bepisode(self):
+        pass
+
+    def remove_bepisode(self):
+        pass
 
 
 class CommandSet(base_classes.CommandSet):
@@ -67,7 +64,7 @@ class CommandSet(base_classes.CommandSet):
             self.command_info_registry[alias] = cmd_info
 
     def _register_commands(self):
-        self.register_command(run, "runs program, vrooooooom", ['run', 'go', 'execute'])
+        self.register_command(self.receivers.run, "runs program, vrooooooom", ['run', 'go', 'execute'])
         self.register_command(base_classes.App.clean_up, 'Deletes all csv files in current directory(src)',
                               ['d', 'D', 'delete', 'cleanup'])
 
@@ -76,6 +73,9 @@ class CommandSet(base_classes.CommandSet):
 
     def list_commands(self):
         pprint.pprint(self.command_info_registry)
+
+    def bind_core_to_receivers(self):
+        return Receivers(self.core)
 
 
 class Interface(base_classes.Interface):

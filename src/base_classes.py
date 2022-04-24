@@ -1,11 +1,10 @@
 """Module for holding ABCs until I clean up core module"""
-import pprint
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
 import os
 
-from src import corev2
+from src import core
 
 
 @dataclass
@@ -27,8 +26,40 @@ class CommandInfo:
     aliases: list[str]
 
 
+class Receivers(ABC):
+    core_engine: core.CoreEngine
+
+    def __init__(self, core_engine):
+        self.core_engine = core_engine
+
+    @abstractmethod
+    def run(self):
+        pass
+
+    @abstractmethod
+    def update_setting(self):
+        pass
+
+    @abstractmethod
+    def reset_settings(self):
+        pass
+
+    @abstractmethod
+    def add_bepisode(self):
+        pass
+
+    @abstractmethod
+    def remove_bepisode(self):
+        pass
+
+
 class CommandSet(ABC):
-    def __init__(self):
+    core: core.CoreEngine
+    receivers: Receivers
+
+    def __init__(self, core_engine):
+        self.core_engine = core_engine
+        self.receivers = self.bind_core_to_receivers()
         self.command_info_registry = {}
         self._register_commands()
 
@@ -48,9 +79,15 @@ class CommandSet(ABC):
     def list_commands(self):
         pass
 
+    @abstractmethod
+    def bind_core_to_receivers(self):
+        pass
+
 
 class CommandSetHandler:
-    def __init__(self, command_set: CommandSet):
+    command_set: CommandSet
+
+    def __init__(self, command_set):
         self.command_set = command_set
         # This will not map to a GUI well. I WILL want an 'ls' command of some sort that returns the command registry
         # for the purposes of displaying some sort of key binds list in the GUI...Interface...I just realized I'm saying
@@ -130,34 +167,6 @@ class InterfaceHandler:
 
     def run(self):
         self.interface.run()
-
-
-class Receivers(ABC):
-
-    core_engine: corev2.CoreEngine
-
-    def __init__(self, core_engine):
-        self.core_engine = core_engine
-
-    @abstractmethod
-    def run(self):
-        pass
-
-    @abstractmethod
-    def update_setting(self):
-        pass
-
-    @abstractmethod
-    def reset_settings(self):
-        pass
-
-    @abstractmethod
-    def add_bepisode(self):
-        pass
-
-    @abstractmethod
-    def remove_bepisode(self):
-        pass
 
 
 # This could easily be a 'main' function. A class allows for namespacing, holding state(settings), and the coupling
