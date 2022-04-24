@@ -10,8 +10,6 @@ from dataclasses import dataclass, field
 from typing import Final, Sequence
 
 # Some constants to help write days for Date class in a more readable form
-
-
 MONDAY: Final = 0
 TUESDAY: Final = 1
 WEDNESDAY: Final = 2
@@ -57,13 +55,9 @@ class Settings:
 
     @staticmethod
     def _get_settings_from_json():
-        try:
-            with open("settings.json", 'r') as json_file:
-                settings_dictionary = json.load(json_file)
-                return settings_dictionary
-        except FileNotFoundError:
-            print('There\'s no settings yet bud...')
-            raise
+        with open("settings.json", 'r') as json_file:
+            settings_dictionary = json.load(json_file)
+            return settings_dictionary
 
     def load_settings(self):
         try:
@@ -75,12 +69,30 @@ class Settings:
 
         self.__dict__ = settings_dict
 
+    def reset_settings(self):
+        self.__dict__ = self.default_settings
+
     def save_settings(self) -> None:
         with open("settings.json", 'w') as json_file:
             json.dump(self.__dict__, json_file)
 
-    def reset_settings(self):
-        self.__dict__ = self.default_settings
+
+# A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
+class ScheduleHandler:
+    def __init__(self, settings):
+        self.settings = settings
+        self.normal_schedule = self.settings.schedules['normal']
+        self.alternate_schedule = self.settings.schedules['alternate']
+        self.current_schedule = self.normal_schedule
+
+    def toggle(self) -> None:
+        if self.current_schedule == self.normal_schedule:
+            self.current_schedule = self.alternate_schedule
+        else:
+            self.current_schedule = self.normal_schedule
+
+    def reset(self) -> None:
+        self.current_schedule = self.normal_schedule
 
 
 # Extended date object. Allows me to couple bleeds, infusions, and infusion timestamps to a given date.
@@ -106,56 +118,11 @@ class Date(datetime.date):
         else:
             raise ValueError('Hour should be 1->24')
 
+    # Creates and returns a list of Date objects within a range based on input.
+    def generate_dates(self, days_added: int) -> list:
+        dates_generated = [self + datetime.timedelta(_) for _ in range(days_added)]
+        return dates_generated
 
-# A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
-class ScheduleHandler:
-    def __init__(self, settings):
-        self.settings = settings
-        self.normal_schedule = self.settings.schedules['normal']
-        self.alternate_schedule = self.settings.schedules['alternate']
-        self.current_schedule = self.normal_schedule
-
-    def toggle(self) -> None:
-        if self.current_schedule == self.normal_schedule:
-            self.current_schedule = self.alternate_schedule
-        else:
-            self.current_schedule = self.normal_schedule
-
-    def reset(self) -> None:
-        self.current_schedule = self.normal_schedule
-
-
-"""Used by beps and for log generation"""
-
-
-# Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
-# 21 days is always possible at the least, then depending on starting wkday max length is extended.
-# TODO: Figured out by hand, consider how I could have done this using math.
-# TODO: Use of magic #s are hindering testing. Only way to test current implementation is...more magic #s.
-# TODO: I'd only be testing that I haven't changed them, which is to say they don't test anything.
-# TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
-# TODO: Bepisodes would continue to be created within this new smaller window as well.
-# TODO: Also, what happens when I pass a decimal into this? Pretty sure it will raise a value error no matter what.
-def _get_max_days(starting_weekday: int) -> int:
-    maximum_possible_days = 21
-    # Mon or Wed
-    if starting_weekday in [MONDAY, WEDNESDAY]:
-        maximum_possible_days += 2
-    # Sun, Tue, or Fri
-    elif starting_weekday in [SUNDAY, TUESDAY, FRIDAY]:
-        maximum_possible_days += 3
-    # Sat or Thr
-    elif starting_weekday in [THURSDAY, SATURDAY]:
-        maximum_possible_days += 4
-    else:
-        raise ValueError('Weekday was out of range while calculating max possible days.')
-    return maximum_possible_days
-
-
-# Creates and returns a list of Date objects within a range based on input.
-def _generate_dates(starting_date: Date, days_added: int) -> list:
-    blank_log = [starting_date + datetime.timedelta(_) for _ in range(days_added)]
-    return blank_log
 
 
 """
@@ -173,7 +140,8 @@ class Bepisode:
     dates_active: list[Date] = field(default_factory=list)
 
     def project_dates(self):
-        self.dates_active = _generate_dates(self.start_date, self.duration)
+        # self.dates_active = _generate_dates(self.start_date, self.duration)
+        self.start_date.generate_dates(self.duration)
 
 
 class BepisodeHandler:
@@ -259,17 +227,42 @@ class Logger:
         self.bepisodes = self.bepisodes_handler.bepisodes
 
         self.starting_date = Date(2022, 2, 2)
-        self.max_possible_days = _get_max_days(self.starting_date.weekday())
+        self.max_possible_days = self._get_max_days()
 
         self.log = None
 
+    # Returns max days possible, given normal prophey schedule, based on a starting wkday as input.
+    # 21 days is always possible at the least, then depending on starting wkday max length is extended.
+    # TODO: Figured out by hand, consider how I could have done this using math.
+    # TODO: Use of magic #s are hindering testing. Only way to test current implementation is...more magic #s.
+    # TODO: I'd only be testing that I haven't changed them, which is to say they don't test anything.
+    # TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
+    # TODO: Bepisodes would continue to be created within this new smaller window as well.
+    # TODO: Also, what happens when I pass a decimal into this? Pretty sure it will raise a value error no matter what.
+    def _get_max_days(self) -> int:
+        starting_weekday = self.starting_date.weekday()
+        maximum_possible_days = 21
+        # Mon or Wed
+        if starting_weekday in [MONDAY, WEDNESDAY]:
+            maximum_possible_days += 2
+        # Sun, Tue, or Fri
+        elif starting_weekday in [SUNDAY, TUESDAY, FRIDAY]:
+            maximum_possible_days += 3
+        # Sat or Thr
+        elif starting_weekday in [THURSDAY, SATURDAY]:
+            maximum_possible_days += 4
+        else:
+            raise ValueError('Weekday was out of range while calculating max possible days.')
+        return maximum_possible_days
+
     def update_starting_date(self, new_date: Date) -> None:
         self.starting_date = new_date
-        self.max_possible_days = _get_max_days(self.starting_date.weekday())
+        self.max_possible_days = self._get_max_days()
 
     def _create_blank_log(self) -> None:
-        blank_log = _generate_dates(self.starting_date, self.max_possible_days)
-        self.log = blank_log
+        self.log = self.starting_date.generate_dates(self.max_possible_days)
+        # blank_log = _generate_dates(self.starting_date, self.max_possible_days)
+        # self.log = blank_log
 
     # TODO: This is on the list for a refactor. Test later.
     # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
@@ -337,13 +330,13 @@ class Logger:
 
         self.log = infusion_log
 
-    # Used to visualize final log output, without having to check csv(or later DB)
-    def print_log(self) -> None:
-        for date in self.log:
-            if date.bleeds_list:
-                print(f'{date} - {date.infused} - {date.bleeds_list}')
-            else:
-                print(f'{date} - {date.infused} - Prophey')
+    # # Used to visualize final log output, without having to check csv(or later DB)
+    # def print_log(self) -> None:
+    #     for date in self.log:
+    #         if date.bleeds_list:
+    #             print(f'{date} - {date.infused} - {date.bleeds_list}')
+    #         else:
+    #             print(f'{date} - {date.infused} - Prophey')
 
     # TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
     # Creates a string title for csv files based on first and last item in a list of Date objects.
@@ -433,7 +426,3 @@ class CoreEngine:
 
 if __name__ == '__main__':
     ...
-    core = CoreEngine()
-    core.logger.generate_log()
-    core.logger.print_log()
-    core.logger.output_log_to_csv()
