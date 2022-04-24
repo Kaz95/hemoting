@@ -6,9 +6,6 @@ import base_classes
 import core
 
 
-# A few test receiver functions. Receivers being a function that encapsulates all the logic needed to carry out
-# a command requested by the user.
-
 def _serialize_date_input(u_input: str):
     match u_input.split('-'):
         case [year, month, day]:
