@@ -167,30 +167,3 @@ class InterfaceHandler:
 
     def run(self):
         self.interface.run()
-
-
-# This could easily be a 'main' function. A class allows for namespacing, holding state(settings), and the coupling
-# of logic to the aforementioned state. Consider if this is the best solution later. Right now main is acting as app.
-class App:
-    """I'll move this to app.py at some point. Easier to work on all my new classes in once place for now."""
-    cmd_handler: CommandSetHandler
-    interface_handler: InterfaceHandler
-
-    # I could set default handler state here?
-    def __init__(self, cmd_handler, interface_handler):
-        self.cmd_handler = cmd_handler
-        self.interface_handler = interface_handler
-
-    @staticmethod
-    def clean_up():
-        files_in_directory = os.listdir('.')
-        csv_files = [file for file in files_in_directory if file.endswith('csv')]
-        for file in csv_files:
-            os.remove(file)
-
-    def run(self):
-        self.interface_handler.run()
-
-
-if __name__ == '__main__':
-    App.clean_up()
