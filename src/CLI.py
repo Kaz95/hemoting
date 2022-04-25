@@ -1,12 +1,14 @@
 """Module for implementing all things CLI"""
+
 import pprint
 from collections.abc import Callable
 
 import base_classes
 import core
+from src import app
 
 
-def _serialize_date_input(u_input: str):
+def _serialize_date_input(u_input: str) -> core.Date:
     match u_input.split('-'):
         case [year, month, day]:
             year = int(year)
@@ -26,7 +28,7 @@ def _print_log(log: list[core.Date]) -> None:
 
 class Receivers(base_classes.Receivers):
 
-    def run(self, args=None):
+    def run(self, args=None) -> None:
         match args:
             case [user_date_input]:
                 starting_date = _serialize_date_input(user_date_input)
@@ -55,29 +57,29 @@ class Receivers(base_classes.Receivers):
 
 class CommandSet(base_classes.CommandSet):
 
-    def register_command(self, receiver: Callable, description: str, aliases: list[str]):
+    def register_command(self, receiver: Callable, description: str, aliases: list[str]) -> None:
         cmd_info = base_classes.CommandInfo(receiver, description, aliases)
         for alias in cmd_info.aliases:
             self.command_info_registry[alias] = cmd_info
 
-    def _register_commands(self):
+    def _register_commands(self) -> None:
         self.register_command(self.receivers.run, "runs program, vrooooooom", ['run', 'go', 'execute'])
-        self.register_command(base_classes.App.clean_up, 'Deletes all csv files in current directory(src)',
+        self.register_command(app.App.clean_up, 'Deletes all csv files in current directory(src)',
                               ['d', 'D', 'delete', 'cleanup'])
 
-    def get_receiver_info(self, cmd):
+    def get_receiver_info(self, cmd) -> Callable:
         return self.command_info_registry[cmd]
 
-    def list_commands(self):
+    def list_commands(self) -> None:
         pprint.pprint(self.command_info_registry)
 
-    def _bind_core_to_receivers(self):
+    def _bind_core_to_receivers(self) -> Receivers:
         return Receivers(self.core)
 
 
 class Interface(base_classes.Interface):
 
-    def run(self):
+    def run(self) -> None:
         while True:
             user_input = input('$ ')
             match user_input:

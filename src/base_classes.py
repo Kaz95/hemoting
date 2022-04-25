@@ -1,8 +1,8 @@
 """Module for holding ABCs until I clean up core module"""
+
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
-import os
 
 from src import core
 
@@ -12,7 +12,7 @@ class Command:
     receiver: Callable
     args: list = field(default_factory=list)
 
-    def execute(self):
+    def execute(self) -> None:
         if self.args:
             self.receiver(self.args)
         else:
@@ -92,7 +92,7 @@ class CommandSetHandler:
         self.command_set.register_command(self._ls, "Lists all commands in the current command set.",
                                           ['ls', 'list'])
 
-    def _split_input(self, user_input):
+    def _split_input(self, user_input) -> Command:
         split_input = user_input.split()
         match split_input:
             case [user_cmd, *args]:
@@ -111,11 +111,11 @@ class CommandSetHandler:
     # This feels like the invoker. To, more closely, follow the command pattern, I should split this method into two
     # parts: 'create_command_from_user_input' and 'invoke'. Which actually makes no sense when you aren't forced into
     # object orientation every step of the way.
-    def handle_command(self, user_input):
+    def handle_command(self, user_input) -> None:
         command = self._split_input(user_input)
         command.execute()
 
-    def _ls(self, args=None):
+    def _ls(self, args=None) -> None:
         match args:
             case [user_cmd_argument]:
                 self._ls_command_info(user_cmd_argument)
@@ -129,7 +129,7 @@ class CommandSetHandler:
         # else:
         #     self.command_set.list_commands()
 
-    def _ls_command_info(self, cmd):
+    def _ls_command_info(self, cmd) -> None:
         cmd_info = self.command_set.command_info_registry[cmd]
         print(f'Command: {cmd}')
         print(f'Description: {cmd_info.description}')

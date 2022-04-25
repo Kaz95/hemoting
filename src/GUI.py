@@ -1,4 +1,5 @@
 """Module for implementing all things GUI"""
+
 import base_classes
 from collections.abc import Callable
 
@@ -10,16 +11,16 @@ class Interface(base_classes.Interface):
 
 class CommandSet(base_classes.CommandSet):
     def get_receiver_info(self, cmd):
-        raise NotImplementedError('Soon™')
+        pass
 
     def register_command(self, receiver: Callable, description: str, aliases: list[str]):
-        raise NotImplementedError('Soon™')
+        pass
 
     def _register_commands(self):
-        raise NotImplementedError('Soon™')
+        pass
 
     def list_commands(self):
-        raise NotImplementedError('Soon™')
+        pass
 
-    def bind_core_to_receivers(self):
-        raise NotImplementedError('Soon™')
+    def _bind_core_to_receivers(self):
+        pass

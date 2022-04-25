@@ -3,7 +3,6 @@
 """
 import csv
 import datetime
-import functools
 import json
 import random
 from dataclasses import dataclass, field
@@ -19,9 +18,7 @@ SATURDAY: Final = 5
 SUNDAY: Final = 6
 
 
-# TODO: Remember JSON doesn't know or care w/e a tuple is. That's on me.
-
-
+# Remember JSON doesn't know or care w/e a tuple is. That's on me.
 class Settings:
     number_of_bleeds: int
     time_stamp_range: dict
@@ -44,32 +41,28 @@ class Settings:
                         'bleed_duration_range': {'min': 1, 'max': 4},
                         'bleed_locations': bleed_locations}
 
-    def _create_settings_json(self):
+    def _create_settings_json(self) -> None:
         try:
             open("settings.json", 'x')
         except FileExistsError:
-            print('Settings already exists!')
+            print('Settings already exists! Why was this even called?')
         else:
             with open("settings.json", 'w') as json_file:
                 json.dump(self.default_settings, json_file)
 
-    @staticmethod
-    def _get_settings_from_json():
+    def _get_settings_from_json(self) -> None:
         with open("settings.json", 'r') as json_file:
-            settings_dictionary = json.load(json_file)
-            return settings_dictionary
+            self.__dict__ = json.load(json_file)
 
-    def load_settings(self):
+    def load_settings(self) -> None:
         try:
-            settings_dict = self._get_settings_from_json()
+            self._get_settings_from_json()
         except FileNotFoundError:
             print('creating default JSON')
             self._create_settings_json()
-            settings_dict = self._get_settings_from_json()
+            self._get_settings_from_json()
 
-        self.__dict__ = settings_dict
-
-    def reset_settings(self):
+    def reset_settings(self) -> None:
         self.__dict__ = self.default_settings
 
     def save_settings(self) -> None:
@@ -79,6 +72,8 @@ class Settings:
 
 # A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
 class ScheduleHandler:
+    settings: Settings
+
     def __init__(self, settings):
         self.settings = settings
         self.normal_schedule = self.settings.schedules['normal']
@@ -124,7 +119,6 @@ class Date(datetime.date):
         return dates_generated
 
 
-
 """
     ====================
     Bepisode shits
@@ -139,9 +133,9 @@ class Bepisode:
     duration: int
     dates_active: list[Date] = field(default_factory=list)
 
-    def project_dates(self):
+    def project_dates(self) -> None:
         # self.dates_active = _generate_dates(self.start_date, self.duration)
-        self.start_date.generate_dates(self.duration)
+        self.dates_active = self.start_date.generate_dates(self.duration)
 
 
 class BepisodeHandler:
@@ -329,14 +323,6 @@ class Logger:
                 break
 
         self.log = infusion_log
-
-    # # Used to visualize final log output, without having to check csv(or later DB)
-    # def print_log(self) -> None:
-    #     for date in self.log:
-    #         if date.bleeds_list:
-    #             print(f'{date} - {date.infused} - {date.bleeds_list}')
-    #         else:
-    #             print(f'{date} - {date.infused} - Prophey')
 
     # TODO: This will blow right the fuck up if list passed doesn't have specific members.  Not date and its fukt.
     # Creates a string title for csv files based on first and last item in a list of Date objects.

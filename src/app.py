@@ -1,13 +1,13 @@
 """Module for handling....handlers....probably...not sure yet. Definitely main entry point though"""
+
 import os
 
 import base_classes
 import CLI
 import core
 
-"""Remember: Receiver -> Command -> Invoker -> Client"""
 
-
+# Remember: Receiver -> Command -> Invoker -> Client
 # This could easily be a 'main' function. A class allows for namespacing, holding state(settings), and the coupling
 # of logic to the aforementioned state. Consider if this is the best solution later. Right now main is acting as app.
 class App:
@@ -21,13 +21,13 @@ class App:
         self.interface_handler = interface_handler
 
     @staticmethod
-    def clean_up():
+    def clean_up() -> None:
         files_in_directory = os.listdir('.')
         csv_files = [file for file in files_in_directory if file.endswith('csv')]
         for file in csv_files:
             os.remove(file)
 
-    def run(self):
+    def run(self) -> None:
         self.interface_handler.run()
 
 
