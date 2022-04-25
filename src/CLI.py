@@ -74,7 +74,7 @@ class CommandSet(base_classes.CommandSet):
         pprint.pprint(self.command_info_registry)
 
     def _bind_core_to_receivers(self) -> Receivers:
-        return Receivers(self.core)
+        return Receivers(self.core_engine)
 
 
 class Interface(base_classes.Interface):
