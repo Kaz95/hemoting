@@ -39,7 +39,6 @@ class Receivers(base_classes.Receivers):
         self.core_engine.logger.generate_log()
 
         _print_log(self.core_engine.logger.log)
-        # self.core_engine.logger.print_log()
         self.core_engine.logger.output_log_to_csv()
 
     def update_setting(self):

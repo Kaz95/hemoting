@@ -134,7 +134,6 @@ class Bepisode:
     dates_active: list[Date] = field(default_factory=list)
 
     def project_dates(self) -> None:
-        # self.dates_active = _generate_dates(self.start_date, self.duration)
         self.dates_active = self.start_date.generate_dates(self.duration)
 
 
@@ -255,8 +254,7 @@ class Logger:
 
     def _create_blank_log(self) -> None:
         self.log = self.starting_date.generate_dates(self.max_possible_days)
-        # blank_log = _generate_dates(self.starting_date, self.max_possible_days)
-        # self.log = blank_log
+
 
     # TODO: This is on the list for a refactor. Test later.
     # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.

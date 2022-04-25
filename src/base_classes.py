@@ -123,11 +123,6 @@ class CommandSetHandler:
                 self.command_set.list_commands()
             case _:
                 print(f"Invalid Command. Expected 1 argument, got {len(args)} instead")
-        # if args:
-        #     option = args[0]
-        #     self.ls_command_info(option)
-        # else:
-        #     self.command_set.list_commands()
 
     def _ls_command_info(self, cmd) -> None:
         cmd_info = self.command_set.command_info_registry[cmd]
