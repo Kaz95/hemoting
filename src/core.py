@@ -1,5 +1,8 @@
-"""This module will be a refactored version of core. This version will be more generalized, and will encapsulate
-    all the state and functionality that makes of the core 'engine'.
+"""
+This module will be a refactored version of core.
+
+This version will be more generalized, and will encapsulate all the state and functionality that makes of the core
+'engine'.
 """
 import csv
 import datetime
@@ -9,13 +12,13 @@ from dataclasses import dataclass, field
 from typing import Final, Sequence
 
 # Some constants to help write days for Date class in a more readable form
-MONDAY: Final = 0
-TUESDAY: Final = 1
-WEDNESDAY: Final = 2
-THURSDAY: Final = 3
-FRIDAY: Final = 4
-SATURDAY: Final = 5
-SUNDAY: Final = 6
+_MONDAY: Final = 0
+_TUESDAY: Final = 1
+_WEDNESDAY: Final = 2
+_THURSDAY: Final = 3
+_FRIDAY: Final = 4
+_SATURDAY: Final = 5
+_SUNDAY: Final = 6
 
 
 # Remember JSON doesn't know or care w/e a tuple is. That's on me.
@@ -220,7 +223,7 @@ class Logger:
         self.bepisodes = self.bepisodes_handler.bepisodes
 
         self.starting_date = Date(2022, 2, 2)
-        self.max_possible_days = self._get_max_days()
+        # self.max_possible_days = self._get_max_days()
 
         self.log = None
 
@@ -232,29 +235,32 @@ class Logger:
     # TODO: Nothing relies on this number being accurate. The log will just be created within a smaller window.
     # TODO: Bepisodes would continue to be created within this new smaller window as well.
     # TODO: Also, what happens when I pass a decimal into this? Pretty sure it will raise a value error no matter what.
-    def _get_max_days(self) -> int:
+    @property
+    def max_possible_days(self) -> int:
+        """
+        Calculate and return maximum possible days lasted, in a given log period, while only doing prophey.
+
+        I wanted the computed value of maximum_possible_days to be decoupled from starting date. This allows starting
+        date to be changed often by the user, but the max_possible_days value will only be computed when the log is
+        first created.
+        """
         starting_weekday = self.starting_date.weekday()
         maximum_possible_days = 21
         # Mon or Wed
-        if starting_weekday in [MONDAY, WEDNESDAY]:
+        if starting_weekday in [_MONDAY, _WEDNESDAY]:
             maximum_possible_days += 2
         # Sun, Tue, or Fri
-        elif starting_weekday in [SUNDAY, TUESDAY, FRIDAY]:
+        elif starting_weekday in [_SUNDAY, _TUESDAY, _FRIDAY]:
             maximum_possible_days += 3
         # Sat or Thr
-        elif starting_weekday in [THURSDAY, SATURDAY]:
+        elif starting_weekday in [_THURSDAY, _SATURDAY]:
             maximum_possible_days += 4
         else:
             raise ValueError('Weekday was out of range while calculating max possible days.')
         return maximum_possible_days
 
-    def update_starting_date(self, new_date: Date) -> None:
-        self.starting_date = new_date
-        self.max_possible_days = self._get_max_days()
-
     def _create_blank_log(self) -> None:
         self.log = self.starting_date.generate_dates(self.max_possible_days)
-
 
     # TODO: This is on the list for a refactor. Test later.
     # Checks each date that bleeding occurred in each bepisode and tries to find a corresponding Date object in given list.
@@ -280,6 +286,8 @@ class Logger:
         infusion_log = []
         scheduler = self.schedule_handler
 
+        # TODO: If I create a doses_on_hand attribute I can make _infuse a method, instead of a weird closure using
+        #  nonlocal. This would adhere to google style guide.
         # Helper function to apply infusion and time-stamp to Date object, increment doses, and handle schedule state.
         def _infuse(toggle: bool = False) -> int:
             nonlocal doses_on_hand
