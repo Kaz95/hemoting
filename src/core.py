@@ -1,8 +1,24 @@
-"""
-This module will be a refactored version of core.
+"""Core Hemoting functionality.
 
-This version will be more generalized, and will encapsulate all the state and functionality that makes of the core
-'engine'.
+Contains all the classes and functions required to create infusion logs. The exported CoreEngine class can be used to
+create logs, and the Settings class can be used to handle user settings functionality. The idea is to provide a single
+class that can be used to build a set of commands, or 'receivers', that encapsulate all the logic required to carry
+out a user action. This module will most likely become a stand alone package one day.
+
+    Example:
+        core = CoreEngine()
+        core.generate_log()
+        pprint.pprint(core.log)
+        core.output_log_to_csv
+
+    Attributes:
+        _MONDAY: Integer representing Monday.
+        _TUESDAY: Integer representing Tuesday.
+        _WEDNESDAY: Integer representing Wednesday.
+        _THURSDAY: Integer representing Thursday.
+        _FRIDAY: Integer representing Friday.
+        _SATURDAY: Integer representing Saturday.
+        _SUNDAY: Integer representing Sunday.
 """
 import csv
 import datetime
@@ -23,6 +39,14 @@ _SUNDAY: Final = 6
 
 # Remember JSON doesn't know or care w/e a tuple is. That's on me.
 class Settings:
+    """User Settings
+
+    Class to encapsulate all user settings data, as well as the initialization of those settings from json, and handling
+    of those settings.
+
+    Attributes:
+        number_of_bleeds: Represents
+    """
     number_of_bleeds: int
     time_stamp_range: dict
     schedules: dict
@@ -30,19 +54,19 @@ class Settings:
     bleed_locations: Sequence
 
     def __init__(self):
-        self.load_settings()
+        self._load_settings()
 
     # Used to randomize bleed location. Nothing else.
-    bleed_locations = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
+    _BLEED_LOCATIONS = ('Elbow', 'Knee', 'Ankle', 'Hip', 'Shoulder', 'Wrist', 'Quadriceps', 'Calf', 'Biceps', 'Triceps')
 
-    normal_prophey_schedule = (0, 2, 4)
-    alternate_prophey_schedule = (1, 3, 5)
+    _NORMAL_PROPHEY_SCHEDULE = (0, 2, 4)
+    _ALTERNATE_PROPHEY_SCHEDULE = (1, 3, 5)
 
-    default_settings = {'number_of_bleeds': 3,
-                        'time_stamp_range': {'min': 7, 'max': 10},
-                        'schedules': {'normal': normal_prophey_schedule, 'alternate': alternate_prophey_schedule},
-                        'bleed_duration_range': {'min': 1, 'max': 4},
-                        'bleed_locations': bleed_locations}
+    _DEFAULT_SETTINGS = {'number_of_bleeds': 3,
+                         'time_stamp_range': {'min': 7, 'max': 10},
+                         'schedules': {'normal': _NORMAL_PROPHEY_SCHEDULE, 'alternate': _ALTERNATE_PROPHEY_SCHEDULE},
+                         'bleed_duration_range': {'min': 1, 'max': 4},
+                         'bleed_locations': _BLEED_LOCATIONS}
 
     def _create_settings_json(self) -> None:
         try:
@@ -51,13 +75,13 @@ class Settings:
             print('Settings already exists! Why was this even called?')
         else:
             with open("settings.json", 'w') as json_file:
-                json.dump(self.default_settings, json_file)
+                json.dump(self._DEFAULT_SETTINGS, json_file)
 
     def _get_settings_from_json(self) -> None:
         with open("settings.json", 'r') as json_file:
             self.__dict__ = json.load(json_file)
 
-    def load_settings(self) -> None:
+    def _load_settings(self) -> None:
         try:
             self._get_settings_from_json()
         except FileNotFoundError:
@@ -66,14 +90,14 @@ class Settings:
             self._get_settings_from_json()
 
     def reset_settings(self) -> None:
-        self.__dict__ = self.default_settings
+        self.__dict__ = self._DEFAULT_SETTINGS
 
     def save_settings(self) -> None:
         with open("settings.json", 'w') as json_file:
             json.dump(self.__dict__, json_file)
 
 
-# A general interface for handling schedule state. Subclass this to extend schedule handling functionality.
+# A general interface for handling schedule state.
 class ScheduleHandler:
     settings: Settings
 
