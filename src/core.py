@@ -1,25 +1,34 @@
 """Core Hemoting functionality.
 
-Contains all the classes and functions required to create infusion logs. The exported CoreEngine class can be used to
-create logs, and the Settings class can be used to handle user settings functionality. The idea is to provide a single
-class that can be used to build a set of commands, or 'receivers', that encapsulate all the logic required to carry
-out a user action. This module will most likely become a stand alone package one day.
+This module contains all the classes and functions required to create infusion logs. The exported CoreEngine class
+can be used to create logs, and the Settings class can be used to handle user settings functionality. The idea is to
+provide a set of classes that can be used to build a set of commands, or 'receivers', that encapsulate all the logic
+required to carry out a user action. This module will most likely become a stand alone package one day(Hemoting Core)
 
-    Example:
-        core = CoreEngine()
-        core.generate_log()
-        pprint.pprint(core.log)
-        core.output_log_to_csv
+Example:
+    core = CoreEngine()
 
-    Attributes:
-        _MONDAY: Integer representing Monday.
-        _TUESDAY: Integer representing Tuesday.
-        _WEDNESDAY: Integer representing Wednesday.
-        _THURSDAY: Integer representing Thursday.
-        _FRIDAY: Integer representing Friday.
-        _SATURDAY: Integer representing Saturday.
-        _SUNDAY: Integer representing Sunday.
+    core.generate_log()
+
+    pprint.pprint(core.log)
+
+    core.output_log_to_csv
+
+Attributes:
+    _MONDAY: Integer representing Monday.
+    _TUESDAY: Integer representing Tuesday.
+    _WEDNESDAY: Integer representing Wednesday.
+    _THURSDAY: Integer representing Thursday.
+    _FRIDAY: Integer representing Friday.
+    _SATURDAY: Integer representing Saturday.
+    _SUNDAY: Integer representing Sunday.
+
+TODO:
+    * Finish adding docstrings.
+    * Update module level docstring when this module becomes a standalone package.
+    * Look for more things to do.
 """
+
 import csv
 import datetime
 import json

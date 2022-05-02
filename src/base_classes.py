@@ -1,4 +1,24 @@
-"""Module for holding ABCs until I clean up core module"""
+"""Classes used to create command sets and user interfaces.
+
+The classes defined in this module are used to build unique command sets and user interfaces bound to those commands.
+A module implementing a front-end(GUI, CLI, ect) must include
+
+This module will make more sense when core functionality is decoupled from front-end implementations. This module will
+essentially be the core of the program 'Hemoting Desktop', which will be built using 'Hemoting Core' the package.
+
+Example:
+    A module implementing a user interface must include:
+        * At least one Receiver class that inherits from the Receiver ABC defined in this module.
+        * At least one CommandSet class that inherits from the CommandSet ABC defined in this module.
+        * At least one Interface class that inherits from the Interface ABC defined in this module.
+
+    CommandSetHandler and InterfaceHandler are used to handle concrete implementations of the base classes defined in
+    this module.
+
+TODO:
+    * Finish adding docstrings.
+    * Look for more things to do.
+"""
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
@@ -26,6 +46,8 @@ class CommandInfo:
     aliases: list[str]
 
 
+# This classes only purpose is to provide a namespace and to define a set of commands any interface or command set
+# should include.
 class Receivers(ABC):
     core_engine: core.CoreEngine
 

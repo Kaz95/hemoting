@@ -1,4 +1,4 @@
-"""Module for implementing all things GUI"""
+"""Home of all things GUI"""
 
 import base_classes
 from collections.abc import Callable

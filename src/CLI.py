@@ -1,4 +1,17 @@
-"""Module for implementing all things CLI"""
+"""Home of all things CLI.
+
+This module encapsulates all of the various concrete implementations of classes used to build command line command sets
+and user interfaces.
+
+Example:
+    default_cmdset = CLI.CommandSet(core)
+    default_interface = CLI.Interface(default_cmdset)
+
+TODO:
+    * Finish adding docstrings.
+    * Look for more things to do.
+"""
+
 
 import pprint
 from collections.abc import Callable
