@@ -1,4 +1,11 @@
-"""
+"""Main entry point to Hemoting App
+
+This module contains the app class definition, which is also the main entry point for the Hemoting App.
+
+Examples:
+    app = App(interface_handler, cmd_handler)
+
+    app.run()
 
 """
 
