@@ -13,16 +13,7 @@ Example:
     pprint.pprint(core.log)
 
     core.output_log_to_csv
-
-Attributes:
-    _MONDAY: Integer representing Monday.
-    _TUESDAY: Integer representing Tuesday.
-    _WEDNESDAY: Integer representing Wednesday.
-    _THURSDAY: Integer representing Thursday.
-    _FRIDAY: Integer representing Friday.
-    _SATURDAY: Integer representing Saturday.
-    _SUNDAY: Integer representing Sunday.
-
+    
 TODO:
     * Finish adding docstrings.
     * Update module level docstring when this module becomes a standalone package.
@@ -54,7 +45,11 @@ class Settings:
     of those settings.
 
     Attributes:
-        number_of_bleeds: Represents
+        number_of_bleeds: Represents the desired number of bleeding episodes in a log run. Includes manual bleeds.
+        time_stamp_range: Represents the desired range in which a time-stamp will be randomized for an infusion.
+        schedules: Represents the possible prophylaxis schedules a user may swap between while generating logs.
+        bleed_duration_range: Represents the desired range of days a bleeding episode may last when randomized.
+        bleed_locations: Represents possible locations for randomized bleeds.
     """
     number_of_bleeds: int
     time_stamp_range: dict
@@ -63,6 +58,10 @@ class Settings:
     bleed_locations: Sequence
 
     def __init__(self):
+        """Initializes settings from JSON
+
+        The settings JSON file is created if it does not already exist.
+        """
         self._load_settings()
 
     # Used to randomize bleed location. Nothing else.
