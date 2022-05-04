@@ -6,13 +6,13 @@ A module implementing a front-end(GUI, CLI, ect) must include
 This module will make more sense when core functionality is decoupled from front-end implementations. This module will
 essentially be the core of the program 'Hemoting Desktop', which will be built using 'Hemoting Core' the package.
 
-Example:
+Examples:
     A module implementing a user interface must include:
         * At least one Receiver class that inherits from the Receiver ABC defined in this module.
         * At least one CommandSet class that inherits from the CommandSet ABC defined in this module.
         * At least one Interface class that inherits from the Interface ABC defined in this module.
 
-    CommandSetHandler and InterfaceHandler are used to handle concrete implementations of the base classes defined in
+    CommandSetHandler and InterfaceHandler act as interfaces for concrete implementations of the base classes defined in
     this module.
 
 TODO:
