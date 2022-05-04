@@ -3,9 +3,9 @@
 This module encapsulates all of the various concrete implementations of classes used to build command line command sets
 and user interfaces.
 
-Example:
-    default_cmdset = CLI.CommandSet(core)
-    default_interface = CLI.Interface(default_cmdset)
+Examples:
+    default_cmdset = CommandSet(core)
+    default_interface = Interface(default_cmdset)
 
 TODO:
     * Finish adding docstrings.
